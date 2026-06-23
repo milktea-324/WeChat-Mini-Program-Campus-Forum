@@ -14,57 +14,40 @@
 
     <view class="title">{{post.title}}</view>
 
-    <image 
-      wx:if="{{post.postImg}}" 
-      class="post-img" 
-      src="{{post.postImg}}" 
-      mode="aspectFill"
-    ></image>
+    <image wx:if="{{post.postImg}}" class="post-img" src="{{post.postImg}}" mode="aspectFill"></image>
 
     <view class="content">{{post.content}}</view>
 
     <view class="count-row">
-  <view class="count-item">
-    <image class="count-icon" src="/images/icon/view.png" mode="aspectFit"></image>
-    <text>浏览 {{post.view}}</text>
-  </view>
+      <view class="count-item">
+        <image class="count-icon" src="/images/icon/view.png" mode="aspectFit"></image>
+        <text>浏览 {{post.view}}</text>
+      </view>
 
-  <view class="count-item">
-    <image 
-      class="count-icon" 
-      src="{{post.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" 
-      mode="aspectFit"
-    ></image>
-    <text>点赞 {{post.like}}</text>
-  </view>
+      <view class="count-item">
+        <image class="count-icon" src="{{post.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" mode="aspectFit"></image>
+        <text>点赞 {{post.like}}</text>
+      </view>
 
-  <view class="count-item">
-    <image class="count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
-    <text>评论 {{post.commentCount}}</text>
-  </view>
-</view>
+      <view class="count-item">
+        <image class="count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
+        <text>评论 {{post.commentCount}}</text>
+      </view>
+    </view>
   </view>
 
   <!-- 操作栏 -->
   <view class="action-card">
-  <view class="action-item {{post.isLiked ? 'active' : ''}}" bindtap="onTapLike">
-    <image 
-      class="action-icon" 
-      src="{{post.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" 
-      mode="aspectFit"
-    ></image>
-    <text>{{post.isLiked ? '已点赞' : '点赞'}}</text>
-  </view>
+    <view class="action-item {{post.isLiked ? 'active' : ''}}" bindtap="onTapLike">
+      <image class="action-icon" src="{{post.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" mode="aspectFit"></image>
+      <text>{{post.isLiked ? '已点赞' : '点赞'}}</text>
+    </view>
 
-  <view class="action-item {{post.isCollected ? 'active' : ''}}" bindtap="onTapCollect">
-    <image 
-      class="action-icon" 
-      src="{{post.isCollected ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" 
-      mode="aspectFit"
-    ></image>
-    <text>{{post.isCollected ? '已收藏' : '收藏'}}</text>
+    <view class="action-item {{post.isCollected ? 'active' : ''}}" bindtap="onTapCollect">
+      <image class="action-icon" src="{{post.isCollected ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" mode="aspectFit"></image>
+      <text>{{post.isCollected ? '已收藏' : '收藏'}}</text>
+    </view>
   </view>
-</view>
 
   <!-- 评论区 -->
   <view class="comment-card">
@@ -95,12 +78,7 @@
 
   <!-- 底部评论输入栏 -->
   <view class="comment-input-bar">
-    <input 
-      class="comment-input"
-      placeholder="写一条评论"
-      value="{{commentText}}"
-      bindinput="onCommentInput"
-    />
+    <input class="comment-input" placeholder="写一条评论" value="{{commentText}}" bindinput="onCommentInput" />
     <button class="send-btn" bindtap="onSubmitComment">发送</button>
   </view>
 </view>
