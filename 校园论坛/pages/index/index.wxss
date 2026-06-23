@@ -1,0 +1,185 @@
+page {
+  background-color: #f5f6f7;
+}
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+/* 顶部轮播图 */
+.banner {
+  width: 100%;
+  height: 360rpx;
+  background-color: #eeeeee;
+}
+
+.banner-img {
+  width: 100%;
+  height: 100%;
+}
+
+/* 搜索框 */
+.search-box {
+  padding: 24rpx 28rpx 12rpx;
+  background-color: #ffffff;
+}
+
+.search-input {
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 28rpx;
+  border-radius: 36rpx;
+  background-color: #f1f2f4;
+  font-size: 28rpx;
+  color: #333333;
+}
+
+/* 分类栏 */
+.category-scroll {
+  white-space: nowrap;
+  background-color: #ffffff;
+  padding: 12rpx 0 20rpx;
+}
+
+.category-list {
+  display: flex;
+  padding: 0 20rpx;
+}
+
+.category-item {
+  flex-shrink: 0;
+  padding: 14rpx 28rpx;
+  margin-right: 18rpx;
+  border-radius: 30rpx;
+  background-color: #f1f2f4;
+  color: #555555;
+  font-size: 26rpx;
+}
+
+.category-active {
+  background-color: #2f80ed;
+  color: #ffffff;
+}
+
+/* 分区标题 */
+.section-title {
+  padding: 28rpx 28rpx 10rpx;
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #222222;
+}
+
+/* 帖子列表 */
+.post-list {
+  padding: 0 24rpx;
+}
+
+/* 帖子卡片 */
+.post-card {
+  margin-top: 22rpx;
+  padding: 24rpx;
+  border-radius: 20rpx;
+  background-color: #ffffff;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.post-user {
+  display: flex;
+  align-items: center;
+}
+
+.post-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background-color: #eeeeee;
+}
+
+.post-user-info {
+  flex: 1;
+  margin-left: 18rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.post-author {
+  font-size: 28rpx;
+  color: #222222;
+  font-weight: 500;
+}
+
+.post-date {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.post-category {
+  padding: 8rpx 18rpx;
+  border-radius: 22rpx;
+  background-color: #edf4ff;
+  color: #2f80ed;
+  font-size: 22rpx;
+}
+
+/* 帖子主体 */
+.post-main {
+  display: flex;
+  margin-top: 22rpx;
+}
+
+.post-text {
+  flex: 1;
+  padding-right: 18rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.post-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #222222;
+  line-height: 44rpx;
+}
+
+.post-content {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 38rpx;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.post-img {
+  width: 170rpx;
+  height: 130rpx;
+  border-radius: 14rpx;
+  background-color: #eeeeee;
+}
+
+/* 底部统计 */
+.post-bottom {
+  display: flex;
+  margin-top: 24rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid #eeeeee;
+}
+
+.post-count {
+  margin-right: 36rpx;
+  font-size: 24rpx;
+  color: #888888;
+}
+
+/* 空状态 */
+.empty {
+  padding: 100rpx 0;
+  text-align: center;
+  font-size: 28rpx;
+  color: #999999;
+}

@@ -1,0 +1,54 @@
+<import src="../../template/post-item.wxml" />
+
+<view class="page">
+  <!-- 顶部轮播图 -->
+  <swiper class="banner" indicator-dots autoplay circular interval="3000">
+    <block wx:for="{{swiperList}}" wx:key="id">
+      <swiper-item>
+        <image class="banner-img" src="{{item.imgSrc}}" mode="aspectFill"></image>
+      </swiper-item>
+    </block>
+  </swiper>
+
+  <!-- 搜索框 -->
+  <view class="search-box">
+    <input 
+      class="search-input"
+      placeholder="搜索校园帖子"
+      value="{{keyword}}"
+      bindinput="onSearchInput"
+    />
+  </view>
+
+  <!-- 分类栏 -->
+  <scroll-view class="category-scroll" scroll-x>
+    <view class="category-list">
+      <block wx:for="{{categoryList}}" wx:key="id">
+        <view 
+          class="category-item {{currentCategory === item.name ? 'category-active' : ''}}"
+          data-category="{{item.name}}"
+          bindtap="onTapCategory"
+        >
+          {{item.name}}
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+
+  <!-- 热门标题 -->
+  <view class="section-title">
+    <text>校园热帖</text>
+  </view>
+
+  <!-- 帖子列表 -->
+  <view class="post-list">
+    <block wx:for="{{showPostList}}" wx:key="postId">
+      <template is="postItem" data="{{post:item}}" />
+    </block>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{showPostList.length === 0}}" class="empty">
+    <text>没有找到相关帖子</text>
+  </view>
+</view>

@@ -1,0 +1,29 @@
+<template name="postItem">
+  <view class="post-card" bindtap="onTapPost" data-post-id="{{post.postId}}">
+    <view class="post-user">
+      <image class="post-avatar" src="{{post.avatar}}" mode="aspectFill"></image>
+
+      <view class="post-user-info">
+        <text class="post-author">{{post.author}}</text>
+        <text class="post-date">{{post.date}}</text>
+      </view>
+
+      <text class="post-category">{{post.category}}</text>
+    </view>
+
+    <view class="post-main">
+      <view class="post-text">
+        <text class="post-title">{{post.title}}</text>
+        <text class="post-content">{{post.content}}</text>
+      </view>
+
+      <image class="post-img" src="{{post.postImg}}" mode="aspectFill"></image>
+    </view>
+
+    <view class="post-bottom">
+      <text class="post-count">浏览 {{post.view}}</text>
+      <text class="post-count">点赞 {{post.like}}</text>
+      <text class="post-count">评论 {{post.commentCount}}</text>
+    </view>
+  </view>
+</template>
