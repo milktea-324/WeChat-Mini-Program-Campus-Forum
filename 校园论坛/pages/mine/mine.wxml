@@ -78,6 +78,25 @@
     <text wx:if="{{keyword !== ''}}"> · 搜索：{{keyword}}</text>
   </view>
 
+  <!-- 排序功能区 -->
+  <view class="sort-card">
+    <view class="sort-row">
+      <view class="sort-item">
+        <text class="sort-label">时间</text>
+        <picker mode="selector" range="{{timeRangeNames}}" value="{{timeRangeIndex}}" bindchange="onTimeRangeChange">
+          <view class="sort-picker">{{timeRangeNames[timeRangeIndex]}}</view>
+        </picker>
+      </view>
+
+      <view class="sort-item">
+        <text class="sort-label">排序</text>
+        <picker mode="selector" range="{{sortNames}}" value="{{sortIndex}}" bindchange="onSortChange">
+          <view class="sort-picker">{{sortNames[sortIndex]}}</view>
+        </picker>
+      </view>
+    </view>
+  </view>
+
   <!-- 列表 -->
   <view class="list-card">
     <block wx:if="{{showList.length > 0}}">

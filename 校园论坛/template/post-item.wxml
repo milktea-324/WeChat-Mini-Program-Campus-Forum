@@ -11,34 +11,36 @@
       <text class="post-category">{{post.category}}</text>
     </view>
 
-    <view class="post-main">
+    <!-- 帖子主体部分 -->
+    <view class="post-main {{post.postImg ? '' : 'post-main-no-cover'}}">
       <view class="post-text">
         <text class="post-title">{{post.title}}</text>
         <text class="post-content">{{post.content}}</text>
       </view>
 
-      <image class="post-img" src="{{post.postImg}}" mode="aspectFill"></image>
+      <image wx:if="{{post.postImg}}" class="post-img" src="{{post.postImg}}" mode="aspectFill"></image>
     </view>
 
     <view class="post-bottom">
-  <view class="post-count">
-    <image class="count-icon" src="/images/icon/view.png" mode="aspectFit"></image>
-    <text>{{post.view}}</text>
-  </view>
+      <view class="post-count">
+        <image class="count-icon" src="/images/icon/view.png" mode="aspectFit"></image>
+        <text>{{post.view}}</text>
+      </view>
 
-  <view class="post-count">
-    <image 
-      class="count-icon" 
-      src="{{post.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" 
-      mode="aspectFit"
-    ></image>
-    <text>{{post.like}}</text>
-  </view>
+      <view class="post-count">
+        <image class="count-icon" src="{{post.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" mode="aspectFit"></image>
+        <text>{{post.like}}</text>
+      </view>
 
-  <view class="post-count">
-    <image class="count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
-    <text>{{post.commentCount}}</text>
-  </view>
-</view>
+      <view class="post-count">
+        <image class="count-icon" src="{{post.isCollected ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" mode="aspectFit"></image>
+        <text>{{post.collect || 0}}</text>
+      </view>
+
+      <view class="post-count">
+        <image class="count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
+        <text>{{post.commentCount}}</text>
+      </view>
+    </view>
   </view>
 </template>

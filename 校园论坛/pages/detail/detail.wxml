@@ -30,6 +30,11 @@
       </view>
 
       <view class="count-item">
+        <image class="count-icon" src="{{post.isCollected ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" mode="aspectFit"></image>
+        <text>收藏 {{post.collect || 0}}</text>
+      </view>
+
+      <view class="count-item">
         <image class="count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
         <text>评论 {{post.commentCount}}</text>
       </view>

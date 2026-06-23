@@ -44,6 +44,7 @@ Page({
       const safeItem = Object.assign({
         view: 0,
         like: 0,
+        collect: 0,
         commentCount: 0,
         isLiked: false,
         isCollected: false,
@@ -141,9 +142,17 @@ Page({
     }
 
     const isCollected = !post.isCollected
+    let collect = Number(post.collect || 0)
+
+    if (isCollected) {
+      collect += 1
+    } else {
+      collect = Math.max(collect - 1, 0)
+    }
 
     const newPost = Object.assign({}, post, {
-      isCollected: isCollected
+      isCollected: isCollected,
+      collect: collect
     })
 
     this.updateCurrentPost(newPost)

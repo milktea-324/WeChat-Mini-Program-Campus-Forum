@@ -5,6 +5,7 @@ Page({
     title: "",
     content: "",
     contact: "",
+    postImg: "",
     categoryIndex: 0,
     categoryNames: []
   },
@@ -61,11 +62,46 @@ Page({
     })
   },
 
+  // 选择封面
+  onChooseCover() {
+    wx.chooseImage({
+      count: 1,
+      sizeType: ["compressed"],
+      sourceType: ["album", "camera"],
+      success: res => {
+        const tempFilePath = res.tempFilePaths[0]
+
+        wx.saveFile({
+          tempFilePath: tempFilePath,
+          success: saveRes => {
+            this.setData({
+              postImg: saveRes.savedFilePath
+            })
+          },
+          fail: () => {
+            // 如果保存失败，期末演示版可以先用临时路径
+            this.setData({
+              postImg: tempFilePath
+            })
+          }
+        })
+      }
+    })
+  },
+
+  // 删除封面
+  onDeleteCover() {
+    this.setData({
+      postImg: ""
+    })
+  },
+
   // 发布帖子
   onSubmit() {
     const title = this.data.title.trim()
     const content = this.data.content.trim()
     const contact = this.data.contact.trim()
+    const postImg = this.data.postImg
     const category = this.data.categoryNames[this.data.categoryIndex]
 
     if (title === "") {
@@ -105,7 +141,8 @@ Page({
       category: category,
       author: "当前用户",
       avatar: "/images/avatar/default.png",
-      postImg: "/images/post/bl.png",
+      postImg: postImg,
+      collect: 0,
       date: this.getToday(),
       view: 0,
       like: 0,
@@ -142,6 +179,7 @@ Page({
       title: "",
       content: "",
       contact: "",
+      postImg: "",
       categoryIndex: 0
     })
   },

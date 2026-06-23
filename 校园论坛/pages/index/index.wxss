@@ -220,3 +220,44 @@ page {
   font-size: 28rpx;
   color: #999999;
 }
+
+.post-main-no-cover .post-text {
+  padding-right: 0;
+}
+
+.post-main-no-cover .post-content {
+  -webkit-line-clamp: 3;
+}
+
+/* 排序功能区 */
+.sort-card {
+  padding: 16rpx 28rpx 20rpx;
+  background-color: #ffffff;
+}
+
+.sort-row {
+  display: flex;
+  gap: 18rpx;
+}
+
+.sort-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 68rpx;
+  padding: 0 20rpx;
+  border-radius: 34rpx;
+  background-color: #f5f6f7;
+  box-sizing: border-box;
+}
+
+.sort-label {
+  margin-right: 12rpx;
+  color: #666666;
+  font-size: 24rpx;
+}
+
+.sort-picker {
+  color: #2f80ed;
+  font-size: 24rpx;
+}

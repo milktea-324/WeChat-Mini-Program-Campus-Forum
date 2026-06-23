@@ -78,6 +78,47 @@ page {
   color: #999999;
 }
 
+.cover-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 180rpx;
+  border-radius: 16rpx;
+  background-color: #f5f6f7;
+  color: #888888;
+  font-size: 28rpx;
+}
+
+.cover-upload-icon {
+  width: 38rpx;
+  height: 38rpx;
+  margin-right: 12rpx;
+}
+
+.cover-preview {
+  position: relative;
+  width: 240rpx;
+  height: 180rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background-color: #eeeeee;
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+}
+
+.cover-delete {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 8rpx 16rpx;
+  background-color: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  font-size: 22rpx;
+}
+
 .picker-box {
   display: flex;
   align-items: center;

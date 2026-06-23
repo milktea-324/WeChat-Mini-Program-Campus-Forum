@@ -1,4 +1,5 @@
 const forumData = require("../../data/forum-data.js")
+const postFilter = require("../../utils/post-filter.js")
 
 Page({
   data: {
@@ -10,6 +11,13 @@ Page({
     currentTab: "my",
     currentCategory: "全部",
     keyword: "",
+
+    timeRangeIndex: 0,
+    sortIndex: 0,
+    timeRangeList: [],
+    sortList: [],
+    timeRangeNames: [],
+    sortNames: [],
 
     categoryList: [],
 
@@ -25,10 +33,42 @@ Page({
 
   onLoad() {
     this.initCategory()
+    this.initSortOptions()
   },
 
   onShow() {
     this.loadData()
+  },
+
+  // 初始化排序选项
+  initSortOptions() {
+    const timeRangeList = postFilter.timeRangeList
+    const sortList = postFilter.sortList
+
+    this.setData({
+      timeRangeList: timeRangeList,
+      sortList: sortList,
+      timeRangeNames: timeRangeList.map(item => item.label),
+      sortNames: sortList.map(item => item.label)
+    })
+  },
+
+  // 修改时间范围
+  onTimeRangeChange(event) {
+    this.setData({
+      timeRangeIndex: Number(event.detail.value)
+    })
+
+    this.updateShowList()
+  },
+
+  // 修改排序条件
+  onSortChange(event) {
+    this.setData({
+      sortIndex: Number(event.detail.value)
+    })
+
+    this.updateShowList()
   },
 
   // 初始化分类
@@ -66,11 +106,13 @@ Page({
       return Object.assign({
         view: 0,
         like: 0,
+        collect: 0,
         commentCount: 0,
         isLiked: false,
         isCollected: false,
         isMine: false,
-        comments: []
+        comments: [],
+        postImg: ""
       }, item)
     })
 
@@ -125,12 +167,16 @@ Page({
     this.updateShowList()
   },
 
-  // 根据 tab、分类、搜索词更新展示列表
+  // 根据 tab、分类、搜索词、时间、排序更新展示列表
   updateShowList() {
     const {
       currentTab,
       currentCategory,
       keyword,
+      timeRangeIndex,
+      sortIndex,
+      timeRangeList,
+      sortList,
       myPostList,
       collectList,
       likeList
@@ -158,28 +204,21 @@ Page({
       emptyText = "你还没有点赞帖子"
     }
 
-    let result = baseList
+    const timeRange = timeRangeList[timeRangeIndex]
+      ? timeRangeList[timeRangeIndex].value
+      : "all"
 
-    // 分类筛选
-    if (currentCategory !== "全部") {
-      result = result.filter(item => item.category === currentCategory)
-    }
+    const sortType = sortList[sortIndex]
+      ? sortList[sortIndex].value
+      : "heat"
 
-    // 关键词搜索
-    if (keyword.trim() !== "") {
-      const key = keyword.trim()
+    const result = postFilter.filterAndSortPosts(baseList, {
+      category: currentCategory,
+      keyword: keyword,
+      timeRange: timeRange,
+      sortType: sortType
+    })
 
-      result = result.filter(item => {
-        return (
-          item.title.includes(key) ||
-          item.content.includes(key) ||
-          item.author.includes(key) ||
-          item.category.includes(key)
-        )
-      })
-    }
-
-    // 空状态区分：原本没有数据，还是筛选后没有结果
     if (baseList.length > 0 && result.length === 0) {
       emptyText = "当前筛选条件下没有帖子"
     }

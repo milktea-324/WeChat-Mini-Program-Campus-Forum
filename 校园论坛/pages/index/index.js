@@ -1,4 +1,5 @@
 const forumData = require("../../data/forum-data.js")
+const postFilter = require("../../utils/post-filter.js")
 
 Page({
   data: {
@@ -7,15 +8,54 @@ Page({
     postList: [],
     showPostList: [],
     currentCategory: "全部",
-    keyword: ""
+    keyword: "",
+
+    timeRangeIndex: 0,
+    sortIndex: 0,
+    timeRangeList: [],
+    sortList: [],
+    timeRangeNames: [],
+    sortNames: []
   },
 
   onLoad() {
     this.initForumData()
+    this.initSortOptions()
   },
 
   onShow() {
     this.loadPosts()
+  },
+
+  // 初始化排序选项
+  initSortOptions() {
+    const timeRangeList = postFilter.timeRangeList
+    const sortList = postFilter.sortList
+
+    this.setData({
+      timeRangeList: timeRangeList,
+      sortList: sortList,
+      timeRangeNames: timeRangeList.map(item => item.label),
+      sortNames: sortList.map(item => item.label)
+    })
+  },
+
+  // 修改时间范围
+  onTimeRangeChange(event) {
+    this.setData({
+      timeRangeIndex: Number(event.detail.value)
+    })
+
+    this.filterPosts()
+  },
+
+  // 修改排序条件
+  onSortChange(event) {
+    this.setData({
+      sortIndex: Number(event.detail.value)
+    })
+
+    this.filterPosts()
   },
 
   // 初始化数据
@@ -34,7 +74,21 @@ Page({
 
   // 加载帖子
   loadPosts() {
-    const posts = wx.getStorageSync("forum_posts") || forumData.postList
+    let posts = wx.getStorageSync("forum_posts") || forumData.postList
+
+    posts = posts.map(item => {
+      return Object.assign({
+        view: 0,
+        like: 0,
+        collect: 0,
+        commentCount: 0,
+        isLiked: false,
+        isCollected: false,
+        isMine: false,
+        comments: [],
+        postImg: ""
+      }, item)
+    })
 
     this.setData({
       postList: posts
@@ -63,22 +117,32 @@ Page({
     this.filterPosts()
   },
 
-  // 筛选帖子
+  // 筛选和排序帖子
   filterPosts() {
-    const { postList, currentCategory, keyword } = this.data
+    const {
+      postList,
+      currentCategory,
+      keyword,
+      timeRangeIndex,
+      sortIndex,
+      timeRangeList,
+      sortList
+    } = this.data
 
-    let result = postList
+    const timeRange = timeRangeList[timeRangeIndex]
+      ? timeRangeList[timeRangeIndex].value
+      : "all"
 
-    if (currentCategory !== "全部") {
-      result = result.filter(item => item.category === currentCategory)
-    }
+    const sortType = sortList[sortIndex]
+      ? sortList[sortIndex].value
+      : "heat"
 
-    if (keyword.trim() !== "") {
-      const key = keyword.trim()
-      result = result.filter(item => {
-        return item.title.includes(key) || item.content.includes(key) || item.author.includes(key)
-      })
-    }
+    const result = postFilter.filterAndSortPosts(postList, {
+      category: currentCategory,
+      keyword: keyword,
+      timeRange: timeRange,
+      sortType: sortType
+    })
 
     this.setData({
       showPostList: result
@@ -86,11 +150,11 @@ Page({
   },
 
   // 点击帖子
-onTapPost(event) {
-  const postId = event.currentTarget.dataset.postId
+  onTapPost(event) {
+    const postId = event.currentTarget.dataset.postId
 
-  wx.navigateTo({
-    url: "/pages/detail/detail?postId=" + postId
-  })
-}
+    wx.navigateTo({
+      url: "/pages/detail/detail?postId=" + postId
+    })
+  }
 })
