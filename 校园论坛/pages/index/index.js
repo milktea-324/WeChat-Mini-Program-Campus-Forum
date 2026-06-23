@@ -5,7 +5,7 @@ const mockComments = require("../../utils/mock-comments.js")
 
 Page({
   data: {
-    swiperList: [],
+    bannerList: [],
     categoryList: [],
     postList: [],
     showPostList: [],
@@ -70,7 +70,6 @@ Page({
     }
 
     this.setData({
-      swiperList: forumData.swiperList,
       categoryList: forumData.categoryList
     })
   },
@@ -78,8 +77,6 @@ Page({
   // 加载帖子
   loadPosts() {
     let posts = wx.getStorageSync("forum_posts") || forumData.postList
-
-    posts = mockComments.fillMockComments(posts)
 
     posts = posts.map(item => {
       return Object.assign({
@@ -95,13 +92,50 @@ Page({
       }, item)
     })
 
-    wx.setStorageSync("forum_posts", posts)
-
     this.setData({
-      postList: posts
+      postList: posts,
+      bannerList: this.getHotBannerList(posts)
     })
 
     this.filterPosts()
+  },
+
+  // 获取热度前三的帖子作为轮播图
+  getHotBannerList(posts) {
+    const list = posts.map(item => {
+      return Object.assign({}, item, {
+        _heat: postFilter.getHeat(item)
+      })
+    })
+
+    list.sort((a, b) => {
+      if (b._heat !== a._heat) {
+        return b._heat - a._heat
+      }
+
+      const timeA = new Date((a.date || "").replace(/-/g, "/")).getTime() || 0
+      const timeB = new Date((b.date || "").replace(/-/g, "/")).getTime() || 0
+
+      return timeB - timeA
+    })
+
+    return list.slice(0, 3).map(item => {
+      delete item._heat
+      return item
+    })
+  },
+
+  // 点击轮播图进入详情页
+  onTapBanner(event) {
+    const postId = event.currentTarget.dataset.postId
+
+    if (!postId) {
+      return
+    }
+
+    wx.navigateTo({
+      url: "/pages/detail/detail?postId=" + postId
+    })
   },
 
   // 搜索输入

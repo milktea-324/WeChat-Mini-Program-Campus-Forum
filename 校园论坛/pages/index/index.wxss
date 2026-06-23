@@ -14,9 +14,86 @@ page {
   background-color: #eeeeee;
 }
 
+.banner-item {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 .banner-img {
   width: 100%;
   height: 100%;
+}
+
+/* 有封面时的底部遮罩 */
+.banner-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 42rpx 28rpx 26rpx;
+  box-sizing: border-box;
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.58),
+      rgba(0, 0, 0, 0));
+}
+
+.banner-rank {
+  display: inline-block;
+  margin-bottom: 10rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 18rpx;
+  background-color: rgba(47, 128, 237, 0.9);
+  color: #ffffff;
+  font-size: 22rpx;
+}
+
+.banner-title {
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: bold;
+  line-height: 46rpx;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 无封面时的标题卡片 */
+.banner-title-card {
+  width: 100%;
+  height: 100%;
+  padding: 56rpx 42rpx;
+  box-sizing: border-box;
+  background-color: #edf4ff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.banner-title-card .banner-rank {
+  align-self: flex-start;
+  margin-bottom: 22rpx;
+}
+
+.banner-title-text {
+  color: #222222;
+  font-size: 40rpx;
+  font-weight: bold;
+  line-height: 56rpx;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.banner-info {
+  margin-top: 20rpx;
+  color: #666666;
+  font-size: 24rpx;
 }
 
 /* 搜索框 */

@@ -1,11 +1,29 @@
 <import src="../../template/post-item.wxml" />
 
 <view class="page">
-  <!-- 顶部轮播图 -->
+  <!-- 顶部轮播图：热度前三帖子 -->
   <swiper class="banner" indicator-dots autoplay circular interval="3000">
-    <block wx:for="{{swiperList}}" wx:key="id">
+    <block wx:for="{{bannerList}}" wx:key="postId">
       <swiper-item>
-        <image class="banner-img" src="{{item.imgSrc}}" mode="aspectFill"></image>
+        <view class="banner-item" data-post-id="{{item.postId}}" bindtap="onTapBanner">
+          <!-- 有封面：显示封面 -->
+          <image wx:if="{{item.postImg}}" class="banner-img" src="{{item.postImg}}" mode="aspectFill"></image>
+
+          <!-- 无封面：显示标题 -->
+          <view wx:else class="banner-title-card">
+            <view class="banner-rank">热度 TOP {{index + 1}}</view>
+            <view class="banner-title-text">{{item.title}}</view>
+            <view class="banner-info">
+              {{item.category}} · 浏览 {{item.view}} · 点赞 {{item.like}}
+            </view>
+          </view>
+
+          <!-- 有封面时的标题遮罩 -->
+          <view wx:if="{{item.postImg}}" class="banner-mask">
+            <view class="banner-rank">热度 TOP {{index + 1}}</view>
+            <view class="banner-title">{{item.title}}</view>
+          </view>
+        </view>
       </swiper-item>
     </block>
   </swiper>
