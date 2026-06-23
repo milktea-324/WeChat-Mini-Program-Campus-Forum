@@ -11,6 +11,7 @@ Page({
     showPostList: [],
     currentCategory: "全部",
     keyword: "",
+    emptyText: "没有找到相关帖子",
 
     timeRangeIndex: 0,
     sortIndex: 0,

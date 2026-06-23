@@ -1,0 +1,75 @@
+<template name="postList">
+  <view class="forum-list">
+    <block wx:if="{{list && list.length > 0}}">
+      <block wx:for="{{list}}" wx:key="postId">
+        <view 
+          class="forum-card" 
+          bindtap="onTapPost" 
+          data-post-id="{{item.postId}}"
+        >
+          <!-- 用户信息 -->
+          <view class="forum-user">
+            <image class="forum-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+
+            <view class="forum-user-info">
+              <text class="forum-author">{{item.author}}</text>
+              <text class="forum-date">{{item.date}}</text>
+            </view>
+
+            <text class="forum-category">{{item.category}}</text>
+          </view>
+
+          <!-- 帖子主体 -->
+          <view class="forum-main {{item.postImg ? '' : 'forum-main-no-cover'}}">
+            <view class="forum-text">
+              <text class="forum-title">{{item.title}}</text>
+              <text class="forum-content">{{item.content}}</text>
+            </view>
+
+            <image 
+              wx:if="{{item.postImg}}" 
+              class="forum-cover" 
+              src="{{item.postImg}}" 
+              mode="aspectFill"
+            ></image>
+          </view>
+
+          <!-- 底部统计 -->
+          <view class="forum-bottom">
+            <view class="forum-count">
+              <image class="forum-count-icon" src="/images/icon/view.png" mode="aspectFit"></image>
+              <text>{{item.view || 0}}</text>
+            </view>
+
+            <view class="forum-count">
+              <image 
+                class="forum-count-icon" 
+                src="{{item.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" 
+                mode="aspectFit"
+              ></image>
+              <text>{{item.like || 0}}</text>
+            </view>
+
+            <view class="forum-count">
+              <image 
+                class="forum-count-icon" 
+                src="{{item.isCollected ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" 
+                mode="aspectFit"
+              ></image>
+              <text>{{item.collect || 0}}</text>
+            </view>
+
+            <view class="forum-count">
+              <image class="forum-count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
+              <text>{{item.commentCount || 0}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </block>
+
+    <view wx:else class="forum-empty">
+      {{emptyText}}
+    </view>
+  </view>
+</template>

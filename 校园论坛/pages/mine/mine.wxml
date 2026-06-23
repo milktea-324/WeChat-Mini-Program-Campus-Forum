@@ -1,3 +1,5 @@
+<import src="../../template/post-list.wxml" />
+
 <view class="page">
   <!-- 用户信息 -->
   <view class="user-card">
@@ -108,29 +110,6 @@
 
   <!-- 列表 -->
   <view class="list-card">
-    <block wx:if="{{showList.length > 0}}">
-      <block wx:for="{{showList}}" wx:key="postId">
-        <view class="post-item" data-post-id="{{item.postId}}" bindtap="onTapPost">
-          <view class="post-top">
-            <text class="post-category">{{item.category}}</text>
-            <text class="post-date">{{item.date}}</text>
-          </view>
-
-          <view class="post-title">{{item.title}}</view>
-
-          <view class="post-content">{{item.content}}</view>
-
-          <view class="post-bottom">
-            <text>浏览 {{item.view}}</text>
-            <text>点赞 {{item.like}}</text>
-            <text>评论 {{item.commentCount}}</text>
-          </view>
-        </view>
-      </block>
-    </block>
-
-    <view wx:else class="empty">
-      {{emptyText}}
-    </view>
+    <template is="postList" data="{{list: showList, emptyText: emptyText}}" />
   </view>
 </view>

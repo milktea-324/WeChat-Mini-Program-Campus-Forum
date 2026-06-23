@@ -1,0 +1,134 @@
+/* 公共帖子列表 */
+.forum-list {
+  width: 100%;
+}
+
+/* 帖子卡片 */
+.forum-card {
+  margin-top: 22rpx;
+  padding: 24rpx;
+  border-radius: 20rpx;
+  background-color: #ffffff;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.forum-user {
+  display: flex;
+  align-items: center;
+}
+
+.forum-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background-color: #eeeeee;
+  flex-shrink: 0;
+}
+
+.forum-user-info {
+  flex: 1;
+  margin-left: 18rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.forum-author {
+  font-size: 28rpx;
+  color: #222222;
+  font-weight: 500;
+}
+
+.forum-date {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.forum-category {
+  padding: 8rpx 18rpx;
+  border-radius: 22rpx;
+  background-color: #edf4ff;
+  color: #2f80ed;
+  font-size: 22rpx;
+  flex-shrink: 0;
+}
+
+/* 主体区域 */
+.forum-main {
+  display: flex;
+  margin-top: 22rpx;
+}
+
+.forum-text {
+  flex: 1;
+  padding-right: 18rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.forum-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #222222;
+  line-height: 44rpx;
+}
+
+.forum-content {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 38rpx;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.forum-cover {
+  width: 170rpx;
+  height: 130rpx;
+  border-radius: 14rpx;
+  background-color: #eeeeee;
+  flex-shrink: 0;
+}
+
+/* 没有封面时，正文占满宽度 */
+.forum-main-no-cover .forum-text {
+  padding-right: 0;
+}
+
+.forum-main-no-cover .forum-content {
+  -webkit-line-clamp: 3;
+}
+
+/* 底部统计 */
+.forum-bottom {
+  display: flex;
+  margin-top: 24rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid #eeeeee;
+}
+
+.forum-count {
+  display: flex;
+  align-items: center;
+  margin-right: 34rpx;
+  font-size: 24rpx;
+  color: #888888;
+}
+
+.forum-count-icon {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 8rpx;
+  flex-shrink: 0;
+}
+
+/* 空状态 */
+.forum-empty {
+  padding: 120rpx 0;
+  text-align: center;
+  color: #999999;
+  font-size: 28rpx;
+}

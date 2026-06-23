@@ -1,4 +1,4 @@
-<import src="../../template/post-item.wxml" />
+<import src="../../template/post-list.wxml" />
 
 <view class="page">
   <!-- 顶部轮播图：热度前三帖子 -->
@@ -80,13 +80,6 @@
 
   <!-- 帖子列表 -->
   <view class="post-list">
-    <block wx:for="{{showPostList}}" wx:key="postId">
-      <template is="postItem" data="{{post:item}}" />
-    </block>
-  </view>
-
-  <!-- 空状态 -->
-  <view wx:if="{{showPostList.length === 0}}" class="empty">
-    <text>没有找到相关帖子</text>
+    <template is="postList" data="{{list: showPostList, emptyText: emptyText}}" />
   </view>
 </view>
