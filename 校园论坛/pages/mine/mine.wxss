@@ -78,13 +78,19 @@ page {
 
 .tab-item {
   flex: 1;
-  height: 68rpx;
-  line-height: 68rpx;
-  text-align: center;
+  min-height: 92rpx;
+  padding: 10rpx 0;
   border-radius: 34rpx;
   font-size: 26rpx;
   color: #666666;
 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-main {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,9 +103,21 @@ page {
   flex-shrink: 0;
 }
 
+.tab-num {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 28rpx;
+}
+
 .tab-active {
   background-color: #edf4ff;
   color: #2f80ed;
+}
+
+.tab-active .tab-num {
+  color: #2f80ed;
+  font-weight: 500;
 }
 
 /* 列表 */

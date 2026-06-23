@@ -36,54 +36,11 @@ const postList = [
     view: 268,
     like: 34,
     collect: 18,
-    commentCount: 6,
+    commentCount: 16,
     isLiked: false,
     isCollected: false,
     isMine: false,
-    comments: [
-      {
-        commentId: 1,
-        author: "阿明",
-        avatar: "/images/avatar/3.png",
-        content: "集合和面向对象建议先看，尤其是 ArrayList、HashMap、继承和多态。",
-        date: "2026-06-01"
-      },
-      {
-        commentId: 2,
-        author: "白露",
-        avatar: "/images/avatar/7.png",
-        content: "异常和 IO 可以放后面复习，先把基础语法和类的部分理清楚。",
-        date: "2026-06-01"
-      },
-      {
-        commentId: 3,
-        author: "云深",
-        avatar: "/images/avatar/18.png",
-        content: "如果时间不够，可以优先看老师课上反复讲过的代码题。",
-        date: "2026-06-02"
-      },
-      {
-        commentId: 4,
-        author: "阿明",
-        avatar: "/images/avatar/3.png",
-        content: "集合和面向对象建议先看，尤其是 ArrayList、HashMap、继承和多态。",
-        date: "2026-06-01"
-      },
-      {
-        commentId: 5,
-        author: "白露",
-        avatar: "/images/avatar/7.png",
-        content: "异常和 IO 可以放后面复习，先把基础语法和类的部分理清楚。",
-        date: "2026-06-01"
-      },
-      {
-        commentId: 6,
-        author: "云深",
-        avatar: "/images/avatar/18.png",
-        content: "如果时间不够，可以优先看老师课上反复讲过的代码题。",
-        date: "2026-06-02"
-      }
-    ]
+    comments: []
   },
   {
     postId: 2,

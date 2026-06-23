@@ -9,39 +9,48 @@
     </view>
   </view>
 
-  <!-- 数据统计 -->
+  <!-- 我的帖子数据统计 -->
   <view class="stat-card">
     <view class="stat-item">
-      <view class="stat-num">{{myPostList.length}}</view>
-      <view class="stat-label">我的发布</view>
+      <view class="stat-num">{{myViewCount}}</view>
+      <view class="stat-label">被浏览</view>
     </view>
 
     <view class="stat-item">
-      <view class="stat-num">{{collectList.length}}</view>
-      <view class="stat-label">我的收藏</view>
+      <view class="stat-num">{{myLikeReceivedCount}}</view>
+      <view class="stat-label">收到点赞</view>
     </view>
 
     <view class="stat-item">
-      <view class="stat-num">{{likeList.length}}</view>
-      <view class="stat-label">我的点赞</view>
+      <view class="stat-num">{{myCollectReceivedCount}}</view>
+      <view class="stat-label">收到收藏</view>
     </view>
   </view>
 
   <!-- 发布 / 收藏 / 点赞切换栏 -->
   <view class="tab-card">
     <view class="tab-item {{currentTab === 'my' ? 'tab-active' : ''}}" data-tab="my" bindtap="onChangeTab">
-      <image class="tab-icon" src="{{currentTab === 'my' ? '/images/icon/edit-active.png' : '/images/icon/edit.png'}}" mode="aspectFit"></image>
-      <text>我的发布</text>
+      <view class="tab-main">
+        <image class="tab-icon" src="{{currentTab === 'my' ? '/images/icon/edit-active.png' : '/images/icon/edit.png'}}" mode="aspectFit"></image>
+        <text>我的发布</text>
+      </view>
+      <view class="tab-num">{{myPostList.length}}</view>
     </view>
 
     <view class="tab-item {{currentTab === 'collect' ? 'tab-active' : ''}}" data-tab="collect" bindtap="onChangeTab">
-      <image class="tab-icon" src="{{currentTab === 'collect' ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" mode="aspectFit"></image>
-      <text>我的收藏</text>
+      <view class="tab-main">
+        <image class="tab-icon" src="{{currentTab === 'collect' ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" mode="aspectFit"></image>
+        <text>我的收藏</text>
+      </view>
+      <view class="tab-num">{{collectList.length}}</view>
     </view>
 
     <view class="tab-item {{currentTab === 'like' ? 'tab-active' : ''}}" data-tab="like" bindtap="onChangeTab">
-      <image class="tab-icon" src="{{currentTab === 'like' ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" mode="aspectFit"></image>
-      <text>我的点赞</text>
+      <view class="tab-main">
+        <image class="tab-icon" src="{{currentTab === 'like' ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" mode="aspectFit"></image>
+        <text>我的点赞</text>
+      </view>
+      <view class="tab-num">{{likeList.length}}</view>
     </view>
   </view>
 

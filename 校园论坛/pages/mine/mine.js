@@ -13,6 +13,10 @@ Page({
     currentCategory: "全部",
     keyword: "",
 
+    myViewCount: 0,
+    myLikeReceivedCount: 0,
+    myCollectReceivedCount: 0,
+
     timeRangeIndex: 0,
     sortIndex: 0,
     timeRangeList: [],
@@ -129,11 +133,25 @@ Page({
 
     const likeList = posts.filter(item => item.isLiked)
 
+    // 统计“我发布的帖子”收到的数据
+    let myViewCount = 0
+    let myLikeReceivedCount = 0
+    let myCollectReceivedCount = 0
+
+    myPostList.forEach(item => {
+      myViewCount += Number(item.view || 0)
+      myLikeReceivedCount += Number(item.like || 0)
+      myCollectReceivedCount += Number(item.collect || 0)
+    })
+
     this.setData({
       posts: posts,
       myPostList: myPostList,
       collectList: collectList,
-      likeList: likeList
+      likeList: likeList,
+      myViewCount: myViewCount,
+      myLikeReceivedCount: myLikeReceivedCount,
+      myCollectReceivedCount: myCollectReceivedCount
     })
 
     this.updateShowList()
