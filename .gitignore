@@ -1,6 +1,6 @@
 project.config.json
 project.private.config.json
 sitemap.json
-images/post/*
-校园论坛/images/avatar/default.png
 校园论坛/.cloudbase/container/*
+.agents/*
+.codex/*
