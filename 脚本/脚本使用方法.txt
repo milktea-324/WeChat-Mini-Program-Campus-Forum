@@ -1,0 +1,12 @@
+脚本放进"C:\Users\username"中，username以你自己C盘中的名字为准。
+记得更改指令中的地址为项目中真实的图片存放地址。
+这条指令是预览模式，不会修改文件名和后缀。
+    powershell -ExecutionPolicy Bypass -File .\rename-jpg-to-png.ps1 -FolderPath "D:\images" -DryRun
+
+
+预览没有问题执行这条指令开始修改文件名和后缀名：
+    powershell -ExecutionPolicy Bypass -File .\rename-jpg-to-png.ps1 -FolderPath "D:\images"
+
+手动指定起始编号的指令，其中101是被指定的编号：
+    powershell -ExecutionPolicy Bypass -File .\rename-jpg-to-png.ps1 -FolderPath "D:\images" -StartNumber 101 -DryRun
+    powershell -ExecutionPolicy Bypass -File .\rename-jpg-to-png.ps1 -FolderPath "D:\images" -StartNumber 101
