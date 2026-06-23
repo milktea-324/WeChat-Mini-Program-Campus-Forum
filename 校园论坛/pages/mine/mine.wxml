@@ -27,7 +27,7 @@
     </view>
   </view>
 
-  <!-- 切换栏 -->
+  <!-- 发布 / 收藏 / 点赞切换栏 -->
   <view class="tab-card">
     <view 
       class="tab-item {{currentTab === 'my' ? 'tab-active' : ''}}"
@@ -52,6 +52,38 @@
     >
       我的点赞
     </view>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-box">
+    <input 
+      class="search-input"
+      placeholder="搜索当前列表中的帖子"
+      value="{{keyword}}"
+      bindinput="onSearchInput"
+    />
+  </view>
+
+  <!-- 分类栏 -->
+  <scroll-view class="category-scroll" scroll-x>
+    <view class="category-list">
+      <block wx:for="{{categoryList}}" wx:key="id">
+        <view 
+          class="category-item {{currentCategory === item.name ? 'category-active' : ''}}"
+          data-category="{{item.name}}"
+          bindtap="onTapCategory"
+        >
+          {{item.name}}
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+
+  <!-- 当前筛选提示 -->
+  <view class="filter-tip">
+    <text>{{tabTitle}}</text>
+    <text wx:if="{{currentCategory !== '全部'}}"> · {{currentCategory}}</text>
+    <text wx:if="{{keyword !== ''}}"> · 搜索：{{keyword}}</text>
   </view>
 
   <!-- 列表 -->
