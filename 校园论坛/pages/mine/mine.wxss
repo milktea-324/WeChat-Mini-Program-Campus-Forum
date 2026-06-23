@@ -84,11 +84,22 @@ page {
   border-radius: 34rpx;
   font-size: 26rpx;
   color: #666666;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-icon {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 8rpx;
+  flex-shrink: 0;
 }
 
 .tab-active {
-  background-color: #2f80ed;
-  color: #ffffff;
+  background-color: #edf4ff;
+  color: #2f80ed;
 }
 
 /* 列表 */
@@ -173,15 +184,33 @@ page {
   background-color: #ffffff;
 }
 
-.search-input {
+.search-inner {
+  display: flex;
+  align-items: center;
   height: 72rpx;
-  line-height: 72rpx;
-  padding: 0 28rpx;
+  padding: 0 24rpx;
   border-radius: 36rpx;
   background-color: #f1f2f4;
+  box-sizing: border-box;
+}
+
+.search-icon {
+  width: 34rpx;
+  height: 34rpx;
+  margin-right: 14rpx;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0;
+  background-color: transparent;
   font-size: 28rpx;
   color: #333333;
 }
+
 
 /* 分类栏 */
 .category-scroll {
@@ -218,4 +247,21 @@ page {
   padding: 0 6rpx;
   font-size: 24rpx;
   color: #888888;
+}
+
+/* 分类标题 */
+.category-title {
+  display: flex;
+  align-items: center;
+  margin-top: 22rpx;
+  padding: 0 6rpx 12rpx;
+  color: #333333;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.category-title-icon {
+  width: 34rpx;
+  height: 34rpx;
+  margin-right: 10rpx;
 }

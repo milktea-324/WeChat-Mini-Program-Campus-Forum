@@ -16,10 +16,19 @@ page {
 }
 
 .form-title {
+  display: flex;
+  align-items: center;
   margin-bottom: 30rpx;
   font-size: 38rpx;
   font-weight: bold;
   color: #222222;
+}
+
+.form-title-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 12rpx;
+  flex-shrink: 0;
 }
 
 .form-item {

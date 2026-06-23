@@ -21,9 +21,24 @@
     </view>
 
     <view class="post-bottom">
-      <text class="post-count">浏览 {{post.view}}</text>
-      <text class="post-count">点赞 {{post.like}}</text>
-      <text class="post-count">评论 {{post.commentCount}}</text>
-    </view>
+  <view class="post-count">
+    <image class="count-icon" src="/images/icon/view.png" mode="aspectFit"></image>
+    <text>{{post.view}}</text>
+  </view>
+
+  <view class="post-count">
+    <image 
+      class="count-icon" 
+      src="{{post.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" 
+      mode="aspectFit"
+    ></image>
+    <text>{{post.like}}</text>
+  </view>
+
+  <view class="post-count">
+    <image class="count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
+    <text>{{post.commentCount}}</text>
+  </view>
+</view>
   </view>
 </template>

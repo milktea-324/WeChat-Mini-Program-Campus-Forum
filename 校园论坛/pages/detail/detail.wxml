@@ -24,22 +24,47 @@
     <view class="content">{{post.content}}</view>
 
     <view class="count-row">
-      <text>浏览 {{post.view}}</text>
-      <text>点赞 {{post.like}}</text>
-      <text>评论 {{post.commentCount}}</text>
-    </view>
+  <view class="count-item">
+    <image class="count-icon" src="/images/icon/view.png" mode="aspectFit"></image>
+    <text>浏览 {{post.view}}</text>
+  </view>
+
+  <view class="count-item">
+    <image 
+      class="count-icon" 
+      src="{{post.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" 
+      mode="aspectFit"
+    ></image>
+    <text>点赞 {{post.like}}</text>
+  </view>
+
+  <view class="count-item">
+    <image class="count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
+    <text>评论 {{post.commentCount}}</text>
+  </view>
+</view>
   </view>
 
   <!-- 操作栏 -->
   <view class="action-card">
-    <view class="action-item {{post.isLiked ? 'active' : ''}}" bindtap="onTapLike">
-      {{post.isLiked ? '已点赞' : '点赞'}}
-    </view>
-
-    <view class="action-item {{post.isCollected ? 'active' : ''}}" bindtap="onTapCollect">
-      {{post.isCollected ? '已收藏' : '收藏'}}
-    </view>
+  <view class="action-item {{post.isLiked ? 'active' : ''}}" bindtap="onTapLike">
+    <image 
+      class="action-icon" 
+      src="{{post.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" 
+      mode="aspectFit"
+    ></image>
+    <text>{{post.isLiked ? '已点赞' : '点赞'}}</text>
   </view>
+
+  <view class="action-item {{post.isCollected ? 'active' : ''}}" bindtap="onTapCollect">
+    <image 
+      class="action-icon" 
+      src="{{post.isCollected ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" 
+      mode="aspectFit"
+    ></image>
+    <text>{{post.isCollected ? '已收藏' : '收藏'}}</text>
+  </view>
+</view>
 
   <!-- 评论区 -->
   <view class="comment-card">

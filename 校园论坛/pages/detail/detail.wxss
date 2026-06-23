@@ -79,6 +79,7 @@ page {
   white-space: pre-wrap;
 }
 
+/* 2026年6月23日14点55分 详情页样式追加 */
 .count-row {
   display: flex;
   margin-top: 30rpx;
@@ -86,6 +87,47 @@ page {
   border-top: 1rpx solid #eeeeee;
   font-size: 24rpx;
   color: #888888;
+}
+
+.count-item {
+  display: flex;
+  align-items: center;
+  margin-right: 34rpx;
+}
+
+.count-icon {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 8rpx;
+  flex-shrink: 0;
+}
+
+.action-item {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  margin: 0 10rpx;
+  border-radius: 36rpx;
+  text-align: center;
+  background-color: #f1f2f4;
+  color: #555555;
+  font-size: 28rpx;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-icon {
+  width: 34rpx;
+  height: 34rpx;
+  margin-right: 10rpx;
+  flex-shrink: 0;
+}
+
+.action-item.active {
+  background-color: #edf4ff;
+  color: #2f80ed;
 }
 
 .count-row text {

@@ -12,6 +12,13 @@
 
   <!-- 搜索框 -->
   <view class="search-box">
+  <view class="search-inner">
+    <image 
+      class="search-icon" 
+      src="{{keyword ? '/images/icon/search-active.png' : '/images/icon/search.png'}}" 
+      mode="aspectFit"
+    ></image>
+
     <input 
       class="search-input"
       placeholder="搜索校园帖子"
@@ -19,6 +26,17 @@
       bindinput="onSearchInput"
     />
   </view>
+</view>
+
+  <!-- 分类标题 -->
+  <view class="category-title">
+  <image 
+    class="category-title-icon" 
+    src="{{currentCategory === '全部' ? '/images/icon/category.png' : '/images/icon/category-active.png'}}" 
+    mode="aspectFit"
+  ></image>
+  <text>分类筛选</text>
+</view>
 
   <!-- 分类栏 -->
   <scroll-view class="category-scroll" scroll-x>
