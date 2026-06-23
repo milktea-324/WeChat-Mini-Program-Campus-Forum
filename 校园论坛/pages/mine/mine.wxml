@@ -29,83 +29,42 @@
 
   <!-- 发布 / 收藏 / 点赞切换栏 -->
   <view class="tab-card">
-  <view 
-    class="tab-item {{currentTab === 'my' ? 'tab-active' : ''}}"
-    data-tab="my"
-    bindtap="onChangeTab"
-  >
-    <image 
-      class="tab-icon" 
-      src="{{currentTab === 'my' ? '/images/icon/edit-active.png' : '/images/icon/edit.png'}}" 
-      mode="aspectFit"
-    ></image>
-    <text>我的发布</text>
-  </view>
+    <view class="tab-item {{currentTab === 'my' ? 'tab-active' : ''}}" data-tab="my" bindtap="onChangeTab">
+      <image class="tab-icon" src="{{currentTab === 'my' ? '/images/icon/edit-active.png' : '/images/icon/edit.png'}}" mode="aspectFit"></image>
+      <text>我的发布</text>
+    </view>
 
-  <view 
-    class="tab-item {{currentTab === 'collect' ? 'tab-active' : ''}}"
-    data-tab="collect"
-    bindtap="onChangeTab"
-  >
-    <image 
-      class="tab-icon" 
-      src="{{currentTab === 'collect' ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" 
-      mode="aspectFit"
-    ></image>
-    <text>我的收藏</text>
-  </view>
+    <view class="tab-item {{currentTab === 'collect' ? 'tab-active' : ''}}" data-tab="collect" bindtap="onChangeTab">
+      <image class="tab-icon" src="{{currentTab === 'collect' ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" mode="aspectFit"></image>
+      <text>我的收藏</text>
+    </view>
 
-  <view 
-    class="tab-item {{currentTab === 'like' ? 'tab-active' : ''}}"
-    data-tab="like"
-    bindtap="onChangeTab"
-  >
-    <image 
-      class="tab-icon" 
-      src="{{currentTab === 'like' ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" 
-      mode="aspectFit"
-    ></image>
-    <text>我的点赞</text>
+    <view class="tab-item {{currentTab === 'like' ? 'tab-active' : ''}}" data-tab="like" bindtap="onChangeTab">
+      <image class="tab-icon" src="{{currentTab === 'like' ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" mode="aspectFit"></image>
+      <text>我的点赞</text>
+    </view>
   </view>
-</view>
 
   <!-- 搜索框 -->
   <view class="search-box">
-  <view class="search-inner">
-    <image 
-      class="search-icon" 
-      src="{{keyword ? '/images/icon/search-active.png' : '/images/icon/search.png'}}" 
-      mode="aspectFit"
-    ></image>
+    <view class="search-inner">
+      <image class="search-icon" src="{{keyword ? '/images/icon/search-active.png' : '/images/icon/search.png'}}" mode="aspectFit"></image>
 
-    <input 
-      class="search-input"
-      placeholder="搜索当前列表中的帖子"
-      value="{{keyword}}"
-      bindinput="onSearchInput"
-    />
+      <input class="search-input" placeholder="搜索当前列表中的帖子" value="{{keyword}}" bindinput="onSearchInput" />
+    </view>
   </view>
-</view>
 
-<!-- 分类标题 -->
-<view class="category-title">
-  <image 
-    class="category-title-icon" 
-    src="{{currentCategory === '全部' ? '/images/icon/category.png' : '/images/icon/category-active.png'}}" 
-    mode="aspectFit"
-  ></image>
-  <text>分类筛选</text>
-</view>
+  <!-- 分类标题 -->
+  <view class="category-title">
+    <image class="category-title-icon" src="{{currentCategory === '全部' ? '/images/icon/category.png' : '/images/icon/category-active.png'}}" mode="aspectFit"></image>
+    <text>分类筛选</text>
+  </view>
 
   <!-- 分类栏 -->
   <scroll-view class="category-scroll" scroll-x>
     <view class="category-list">
       <block wx:for="{{categoryList}}" wx:key="id">
-        <view 
-          class="category-item {{currentCategory === item.name ? 'category-active' : ''}}"
-          data-category="{{item.name}}"
-          bindtap="onTapCategory"
-        >
+        <view class="category-item {{currentCategory === item.name ? 'category-active' : ''}}" data-category="{{item.name}}" bindtap="onTapCategory">
           {{item.name}}
         </view>
       </block>
