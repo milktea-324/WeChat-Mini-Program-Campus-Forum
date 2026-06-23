@@ -1,3 +1,6 @@
 project.config.json
 project.private.config.json
 sitemap.json
+images/avatar/*
+images/post/*
+校园论坛/images/avatar/default.png

@@ -1,0 +1,165 @@
+page {
+  background-color: #f5f6f7;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+/* 用户信息 */
+.user-card {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  border-radius: 24rpx;
+  background-color: #2f80ed;
+  color: #ffffff;
+}
+
+.user-avatar {
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 50%;
+  background-color: #eeeeee;
+}
+
+.user-info {
+  margin-left: 24rpx;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.desc {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  opacity: 0.85;
+}
+
+/* 统计卡片 */
+.stat-card {
+  display: flex;
+  margin-top: 22rpx;
+  padding: 28rpx 0;
+  border-radius: 22rpx;
+  background-color: #ffffff;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 38rpx;
+  font-weight: bold;
+  color: #222222;
+}
+
+.stat-label {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #888888;
+}
+
+/* 切换栏 */
+.tab-card {
+  display: flex;
+  margin-top: 22rpx;
+  padding: 10rpx;
+  border-radius: 22rpx;
+  background-color: #ffffff;
+}
+
+.tab-item {
+  flex: 1;
+  height: 68rpx;
+  line-height: 68rpx;
+  text-align: center;
+  border-radius: 34rpx;
+  font-size: 26rpx;
+  color: #666666;
+}
+
+.tab-active {
+  background-color: #2f80ed;
+  color: #ffffff;
+}
+
+/* 列表 */
+.list-card {
+  margin-top: 22rpx;
+}
+
+.post-item {
+  margin-bottom: 22rpx;
+  padding: 26rpx;
+  border-radius: 22rpx;
+  background-color: #ffffff;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.post-top {
+  display: flex;
+  align-items: center;
+}
+
+.post-category {
+  padding: 8rpx 18rpx;
+  border-radius: 22rpx;
+  background-color: #edf4ff;
+  color: #2f80ed;
+  font-size: 22rpx;
+}
+
+.post-date {
+  flex: 1;
+  text-align: right;
+  color: #999999;
+  font-size: 22rpx;
+}
+
+.post-title {
+  margin-top: 18rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #222222;
+  line-height: 46rpx;
+}
+
+.post-content {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 40rpx;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.post-bottom {
+  display: flex;
+  margin-top: 22rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid #eeeeee;
+  color: #888888;
+  font-size: 24rpx;
+}
+
+.post-bottom text {
+  margin-right: 30rpx;
+}
+
+.empty {
+  padding: 120rpx 0;
+  text-align: center;
+  color: #999999;
+  font-size: 28rpx;
+}

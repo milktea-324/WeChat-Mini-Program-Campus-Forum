@@ -1,0 +1,84 @@
+<view class="page">
+  <!-- 用户信息 -->
+  <view class="user-card">
+    <image class="user-avatar" src="{{user.avatar}}" mode="aspectFill"></image>
+
+    <view class="user-info">
+      <view class="nickname">{{user.nickname}}</view>
+      <view class="desc">校园生活圈用户</view>
+    </view>
+  </view>
+
+  <!-- 数据统计 -->
+  <view class="stat-card">
+    <view class="stat-item">
+      <view class="stat-num">{{myPostList.length}}</view>
+      <view class="stat-label">我的发布</view>
+    </view>
+
+    <view class="stat-item">
+      <view class="stat-num">{{collectList.length}}</view>
+      <view class="stat-label">我的收藏</view>
+    </view>
+
+    <view class="stat-item">
+      <view class="stat-num">{{likeList.length}}</view>
+      <view class="stat-label">我的点赞</view>
+    </view>
+  </view>
+
+  <!-- 切换栏 -->
+  <view class="tab-card">
+    <view 
+      class="tab-item {{currentTab === 'my' ? 'tab-active' : ''}}"
+      data-tab="my"
+      bindtap="onChangeTab"
+    >
+      我的发布
+    </view>
+
+    <view 
+      class="tab-item {{currentTab === 'collect' ? 'tab-active' : ''}}"
+      data-tab="collect"
+      bindtap="onChangeTab"
+    >
+      我的收藏
+    </view>
+
+    <view 
+      class="tab-item {{currentTab === 'like' ? 'tab-active' : ''}}"
+      data-tab="like"
+      bindtap="onChangeTab"
+    >
+      我的点赞
+    </view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list-card">
+    <block wx:if="{{showList.length > 0}}">
+      <block wx:for="{{showList}}" wx:key="postId">
+        <view class="post-item" data-post-id="{{item.postId}}" bindtap="onTapPost">
+          <view class="post-top">
+            <text class="post-category">{{item.category}}</text>
+            <text class="post-date">{{item.date}}</text>
+          </view>
+
+          <view class="post-title">{{item.title}}</view>
+
+          <view class="post-content">{{item.content}}</view>
+
+          <view class="post-bottom">
+            <text>浏览 {{item.view}}</text>
+            <text>点赞 {{item.like}}</text>
+            <text>评论 {{item.commentCount}}</text>
+          </view>
+        </view>
+      </block>
+    </block>
+
+    <view wx:else class="empty">
+      {{emptyText}}
+    </view>
+  </view>
+</view>

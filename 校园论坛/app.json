@@ -1,12 +1,34 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/detail/detail"
+    "pages/detail/detail",
+    "pages/publish/publish",
+    "pages/mine/mine"
   ],
   "window": {
     "navigationBarTitleText": "校园生活圈",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#f5f6f7"
+  },
+  "tabBar": {
+    "color": "#666666",
+    "selectedColor": "#2f80ed",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/publish/publish",
+        "text": "发布"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的"
+      }
+    ]
   }
 }
