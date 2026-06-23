@@ -1,5 +1,6 @@
 const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
+const mockComments = require("../../utils/mock-comments.js") //脚本自动补全评论
 
 Page({
   data: {
@@ -100,6 +101,8 @@ Page({
       posts = forumData.postList || []
       wx.setStorageSync("forum_posts", posts)
     }
+
+    posts = mockComments.fillMockComments(posts)
 
     // 兼容旧数据，避免字段缺失导致页面报错
     posts = posts.map(item => {

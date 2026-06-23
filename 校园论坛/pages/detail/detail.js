@@ -1,4 +1,5 @@
 const forumData = require("../../data/forum-data.js")
+const mockComments = require("../../utils/mock-comments.js")  //脚本自动补齐评论
 
 Page({
   data: {
@@ -38,6 +39,8 @@ Page({
     if (!posts || posts.length === 0) {
       posts = forumData.postList || []
     }
+
+    posts = mockComments.fillMockComments(posts)
 
     // 兼容旧数据：如果之前首页数据里没有 isLiked、comments 等字段，这里自动补上
     posts = posts.map(item => {
