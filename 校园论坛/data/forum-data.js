@@ -35,6 +35,7 @@ const postList = [
     date: "2026-06-18",
     view: 128,
     like: 12,
+    collect: 7,
     commentCount: 3,
     isCollected: false
   },
@@ -49,6 +50,7 @@ const postList = [
     date: "2026-06-19",
     view: 89,
     like: 5,
+    collect: 4,
     commentCount: 1,
     isCollected: false
   },
@@ -63,6 +65,7 @@ const postList = [
     date: "2026-06-20",
     view: 76,
     like: 8,
+    collect: 4,
     commentCount: 2,
     isCollected: false
   },
@@ -91,6 +94,7 @@ const postList = [
     date: "2026-06-22",
     view: 203,
     like: 26,
+    collect: 46,
     commentCount: 9,
     isCollected: false
   }
