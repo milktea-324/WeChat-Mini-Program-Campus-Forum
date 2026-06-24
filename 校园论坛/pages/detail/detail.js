@@ -1,5 +1,6 @@
 const forumData = require("../../data/forum-data.js")
 const mockComments = require("../../utils/mock-comments.js")  //脚本自动补齐评论
+const mockUsers = require("../../utils/mock-users.js")
 
 Page({
   data: {
@@ -64,6 +65,9 @@ Page({
 
       return safeItem
     })
+
+    const userResult = mockUsers.fillMockUsers(posts)
+    posts = userResult.posts
 
     const index = posts.findIndex(item => Number(item.postId) === Number(this.data.postId))
 
@@ -228,5 +232,32 @@ Page({
     const day = String(date.getDate()).padStart(2, "0")
 
     return year + "-" + month + "-" + day
+  },
+
+  // 点击作者头像进入作者主页
+  onTapAuthor(event) {
+    const authorId = event.currentTarget.dataset.authorId
+    const isCurrentUser = event.currentTarget.dataset.isCurrentUser === true ||
+      event.currentTarget.dataset.isCurrentUser === "true"
+
+    if (isCurrentUser || authorId === mockUsers.CURRENT_USER_ID) {
+      wx.showToast({
+        title: "不能进入自己的作者页",
+        icon: "none"
+      })
+      return
+    }
+
+    const url = mockUsers.getAuthorProfileUrl({
+      userId: authorId
+    })
+
+    if (!url) {
+      return
+    }
+
+    wx.navigateTo({
+      url: url
+    })
   }
 })

@@ -2,6 +2,7 @@ const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
 // 脚本自动补齐评论
 const mockComments = require("../../utils/mock-comments.js")
+const mockUsers = require("../../utils/mock-users.js")
 
 Page({
   data: {
@@ -66,7 +67,10 @@ Page({
     const storagePosts = wx.getStorageSync("forum_posts")
 
     if (!storagePosts || storagePosts.length === 0) {
-      const posts = mockComments.fillMockComments(forumData.postList)
+      const postsWithComments = mockComments.fillMockComments(forumData.postList)
+      const userResult = mockUsers.fillMockUsers(postsWithComments)
+      const posts = userResult.posts
+
       wx.setStorageSync("forum_posts", posts)
     }
 
@@ -78,6 +82,8 @@ Page({
   // 加载帖子
   loadPosts() {
     let posts = wx.getStorageSync("forum_posts") || forumData.postList
+
+    posts = mockComments.fillMockComments(posts)
 
     posts = posts.map(item => {
       return Object.assign({
@@ -92,6 +98,11 @@ Page({
         postImg: ""
       }, item)
     })
+
+    const userResult = mockUsers.fillMockUsers(posts)
+    posts = userResult.posts
+
+    wx.setStorageSync("forum_posts", posts)
 
     this.setData({
       postList: posts,
@@ -197,6 +208,33 @@ Page({
 
     wx.navigateTo({
       url: "/pages/detail/detail?postId=" + postId
+    })
+  },
+
+  // 点击作者头像进入作者主页
+  onTapAuthor(event) {
+    const authorId = event.currentTarget.dataset.authorId
+    const isCurrentUser = event.currentTarget.dataset.isCurrentUser === true ||
+      event.currentTarget.dataset.isCurrentUser === "true"
+
+    if (isCurrentUser || authorId === mockUsers.CURRENT_USER_ID) {
+      wx.showToast({
+        title: "不能进入自己的作者页",
+        icon: "none"
+      })
+      return
+    }
+
+    const url = mockUsers.getAuthorProfileUrl({
+      userId: authorId
+    })
+
+    if (!url) {
+      return
+    }
+
+    wx.navigateTo({
+      url: url
     })
   }
 })

@@ -3,6 +3,8 @@ project.private.config.json
 校园论坛/.cloudbase/container/*
 .agents/*
 .codex/*
+codex/*
 campus-life-project-document.docx
 异常问题记录-2026-06-24-163142.md
 ~$mpus-life-project-document.docx
+docs/*

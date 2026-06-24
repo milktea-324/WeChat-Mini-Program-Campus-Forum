@@ -9,7 +9,15 @@
         >
           <!-- 用户信息 -->
           <view class="forum-user">
-            <image class="forum-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+            <view
+              class="forum-avatar-wrap"
+              catchtap="onTapAuthor"
+              data-author-id="{{item.authorId}}"
+              data-is-current-user="{{item.authorInfo.isCurrentUser}}"
+              data-author-name="{{item.author}}"
+            >
+              <image class="forum-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+            </view>
 
             <view class="forum-user-info">
               <text class="forum-author">{{item.author}}</text>

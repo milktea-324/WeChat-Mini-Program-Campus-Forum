@@ -1,0 +1,67 @@
+<import src="../../template/post-list.wxml" />
+
+<view class="page" wx:if="{{user}}">
+  <view class="profile-card">
+    <image class="profile-avatar" src="{{user.avatar}}" mode="aspectFill"></image>
+
+    <view class="profile-main">
+      <view class="nickname">{{user.nickname}}</view>
+      <view class="bio">{{user.bio}}</view>
+
+      <view class="tag-row">
+        <view class="profile-tag">{{user.grade}}</view>
+        <view class="profile-tag">{{user.department}}</view>
+        <view class="profile-tag">{{user.roleName}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="stat-card">
+    <view class="stat-item">
+      <view class="stat-num">{{user.stats.postCount}}</view>
+      <view class="stat-label">发布</view>
+    </view>
+
+    <view class="stat-item">
+      <view class="stat-num">{{user.stats.viewCount}}</view>
+      <view class="stat-label">浏览</view>
+    </view>
+
+    <view class="stat-item">
+      <view class="stat-num">{{user.stats.likeCount}}</view>
+      <view class="stat-label">点赞</view>
+    </view>
+
+    <view class="stat-item">
+      <view class="stat-num">{{user.stats.collectCount}}</view>
+      <view class="stat-label">收藏</view>
+    </view>
+
+    <view class="stat-item">
+      <view class="stat-num">{{user.stats.commentCount}}</view>
+      <view class="stat-label">评论</view>
+    </view>
+  </view>
+
+  <view class="meta-card">
+    <view class="meta-title">资料标签</view>
+
+    <view class="interest-list">
+      <block wx:for="{{user.tags}}" wx:key="*this">
+        <view class="interest-item">{{item}}</view>
+      </block>
+    </view>
+  </view>
+
+  <view class="section-title">
+    <text>TA的发布</text>
+  </view>
+
+  <view class="post-list">
+    <template is="postList" data="{{list: authorPosts, emptyText: emptyText}}" />
+  </view>
+</view>
+
+<view wx:else class="loading">
+  正在加载作者资料
+</view>

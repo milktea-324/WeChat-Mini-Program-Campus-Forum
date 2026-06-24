@@ -1,6 +1,7 @@
 const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
 const mockComments = require("../../utils/mock-comments.js") //脚本自动补全评论
+const mockUsers = require("../../utils/mock-users.js")
 
 Page({
   data: {
@@ -103,7 +104,6 @@ Page({
 
     if (!posts || posts.length === 0) {
       posts = forumData.postList || []
-      wx.setStorageSync("forum_posts", posts)
     }
 
     posts = mockComments.fillMockComments(posts)
@@ -122,6 +122,11 @@ Page({
         postImg: ""
       }, item)
     })
+
+    const userResult = mockUsers.fillMockUsers(posts)
+    posts = userResult.posts
+
+    wx.setStorageSync("forum_posts", posts)
 
     const myPostIds = wx.getStorageSync("forum_my_posts") || []
 
@@ -257,6 +262,33 @@ Page({
 
     wx.navigateTo({
       url: "/pages/detail/detail?postId=" + postId
+    })
+  },
+
+  // 点击作者头像进入作者主页
+  onTapAuthor(event) {
+    const authorId = event.currentTarget.dataset.authorId
+    const isCurrentUser = event.currentTarget.dataset.isCurrentUser === true ||
+      event.currentTarget.dataset.isCurrentUser === "true"
+
+    if (isCurrentUser || authorId === mockUsers.CURRENT_USER_ID) {
+      wx.showToast({
+        title: "不能进入自己的作者页",
+        icon: "none"
+      })
+      return
+    }
+
+    const url = mockUsers.getAuthorProfileUrl({
+      userId: authorId
+    })
+
+    if (!url) {
+      return
+    }
+
+    wx.navigateTo({
+      url: url
     })
   }
 })
