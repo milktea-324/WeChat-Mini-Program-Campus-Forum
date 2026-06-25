@@ -68,7 +68,7 @@
             </view>
 
             <view class="forum-count">
-              <image class="forum-count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
+              <image class="forum-count-icon" src="/images/icon/comment.png" mode="aspectFit"></image>
               <text>{{item.commentCount || 0}}</text>
             </view>
           </view>

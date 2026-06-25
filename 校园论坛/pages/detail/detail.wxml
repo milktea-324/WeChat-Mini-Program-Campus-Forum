@@ -43,7 +43,7 @@
       </view>
 
       <view class="count-item">
-        <image class="count-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
+        <image class="count-icon" src="/images/icon/comment.png" mode="aspectFit"></image>
         <text>评论 {{post.commentCount}}</text>
       </view>
     </view>

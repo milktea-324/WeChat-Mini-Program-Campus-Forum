@@ -46,7 +46,7 @@
       </view>
 
       <view wx:else class="cover-upload" bindtap="onChooseCover">
-        <image class="cover-upload-icon" src="/images/icon/edit.png" mode="aspectFit"></image>
+        <image class="cover-upload-icon" src="/images/icon/image.png" mode="aspectFit"></image>
         <text>选择封面图片</text>
       </view>
     </view>

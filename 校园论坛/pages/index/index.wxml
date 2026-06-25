@@ -66,6 +66,7 @@
 
       <view class="sort-item">
         <text class="sort-label">排序</text>
+        <image class="sort-icon" src="/images/icon/sort.png" mode="aspectFit"></image>
         <picker mode="selector" range="{{sortNames}}" value="{{sortIndex}}" bindchange="onSortChange">
           <view class="sort-picker">{{sortNames[sortIndex]}}</view>
         </picker>

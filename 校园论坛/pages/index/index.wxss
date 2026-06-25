@@ -336,6 +336,14 @@ page {
   font-size: 24rpx;
 }
 
+.sort-icon {
+  order: -1;
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 8rpx;
+  flex-shrink: 0;
+}
+
 .sort-picker {
   color: #2f80ed;
   font-size: 24rpx;
