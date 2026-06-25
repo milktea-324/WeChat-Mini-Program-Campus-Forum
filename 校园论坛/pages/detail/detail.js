@@ -1,6 +1,5 @@
-const forumData = require("../../data/forum-data.js")
-const mockComments = require("../../utils/mock-comments.js")  //脚本自动补齐评论
 const mockUsers = require("../../utils/mock-users.js")
+const forumStore = require("../../utils/forum-store.js")
 
 Page({
   data: {
@@ -34,44 +33,19 @@ Page({
 
   // 加载当前帖子
   loadPost(addView) {
-    let posts = wx.getStorageSync("forum_posts")
+    let post = null
 
-    // 如果用户直接打开详情页，缓存里可能还没有数据
-    if (!posts || posts.length === 0) {
-      posts = forumData.postList || []
+    if (addView) {
+      post = forumStore.updatePostById(this.data.postId, item => {
+        return Object.assign({}, item, {
+          view: Number(item.view || 0) + 1
+        })
+      })
+    } else {
+      post = forumStore.findPostById(this.data.postId)
     }
 
-    posts = mockComments.fillMockComments(posts)
-
-    // 兼容旧数据：如果之前首页数据里没有 isLiked、comments 等字段，这里自动补上
-    posts = posts.map(item => {
-      const safeItem = Object.assign({
-        view: 0,
-        like: 0,
-        collect: 0,
-        commentCount: 0,
-        isLiked: false,
-        isCollected: false,
-        comments: []
-      }, item)
-
-      if (!safeItem.comments) {
-        safeItem.comments = []
-      }
-
-      if (safeItem.commentCount === undefined || safeItem.commentCount === null) {
-        safeItem.commentCount = safeItem.comments.length
-      }
-
-      return safeItem
-    })
-
-    const userResult = mockUsers.fillMockUsers(posts)
-    posts = userResult.posts
-
-    const index = posts.findIndex(item => Number(item.postId) === Number(this.data.postId))
-
-    if (index === -1) {
+    if (!post) {
       wx.showToast({
         title: "没有找到该帖子",
         icon: "none"
@@ -84,34 +58,21 @@ Page({
       return
     }
 
-    if (addView) {
-      posts[index].view = Number(posts[index].view || 0) + 1
-    }
-
-    posts[index].commentCount = posts[index].comments.length
-
-    wx.setStorageSync("forum_posts", posts)
-
     this.setData({
-      post: posts[index]
+      post: post
     })
   },
 
   // 更新当前帖子并写回缓存
   updateCurrentPost(newPost) {
-    const posts = wx.getStorageSync("forum_posts") || []
-    const index = posts.findIndex(item => Number(item.postId) === Number(this.data.postId))
+    const post = forumStore.updatePostById(this.data.postId, () => newPost)
 
-    if (index === -1) {
+    if (!post) {
       return
     }
 
-    posts[index] = newPost
-
-    wx.setStorageSync("forum_posts", posts)
-
     this.setData({
-      post: newPost
+      post: post
     })
   },
 

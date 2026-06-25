@@ -1,6 +1,5 @@
-const forumData = require("../../data/forum-data.js")
-const mockComments = require("../../utils/mock-comments.js")
 const mockUsers = require("../../utils/mock-users.js")
+const forumStore = require("../../utils/forum-store.js")
 
 Page({
   data: {
@@ -33,19 +32,8 @@ Page({
 
   // 加载作者资料和该作者发布的帖子
   loadUser(authorId) {
-    let posts = wx.getStorageSync("forum_posts")
-
-    if (!posts || posts.length === 0) {
-      posts = forumData.postList || []
-    }
-
-    posts = mockComments.fillMockComments(posts)
-
-    const userResult = mockUsers.fillMockUsers(posts)
-    const users = userResult.users
-
-    posts = userResult.posts
-    wx.setStorageSync("forum_posts", posts)
+    const postData = forumStore.getPostData()
+    const users = postData.users
 
     const user = mockUsers.findUserById(users, authorId)
 

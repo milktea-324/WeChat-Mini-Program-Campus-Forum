@@ -1,8 +1,7 @@
 const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
-// 脚本自动补齐评论
-const mockComments = require("../../utils/mock-comments.js")
 const mockUsers = require("../../utils/mock-users.js")
+const forumStore = require("../../utils/forum-store.js")
 
 Page({
   data: {
@@ -64,15 +63,7 @@ Page({
 
   // 初始化数据
   initForumData() {
-    const storagePosts = wx.getStorageSync("forum_posts")
-
-    if (!storagePosts || storagePosts.length === 0) {
-      const postsWithComments = mockComments.fillMockComments(forumData.postList)
-      const userResult = mockUsers.fillMockUsers(postsWithComments)
-      const posts = userResult.posts
-
-      wx.setStorageSync("forum_posts", posts)
-    }
+    forumStore.getPosts()
 
     this.setData({
       categoryList: forumData.categoryList
@@ -81,28 +72,7 @@ Page({
 
   // 加载帖子
   loadPosts() {
-    let posts = wx.getStorageSync("forum_posts") || forumData.postList
-
-    posts = mockComments.fillMockComments(posts)
-
-    posts = posts.map(item => {
-      return Object.assign({
-        view: 0,
-        like: 0,
-        collect: 0,
-        commentCount: 0,
-        isLiked: false,
-        isCollected: false,
-        isMine: false,
-        comments: [],
-        postImg: ""
-      }, item)
-    })
-
-    const userResult = mockUsers.fillMockUsers(posts)
-    posts = userResult.posts
-
-    wx.setStorageSync("forum_posts", posts)
+    const posts = forumStore.getPosts()
 
     this.setData({
       postList: posts,

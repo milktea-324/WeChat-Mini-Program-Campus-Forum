@@ -1,7 +1,7 @@
 const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
-const mockComments = require("../../utils/mock-comments.js") //脚本自动补全评论
 const mockUsers = require("../../utils/mock-users.js")
+const forumStore = require("../../utils/forum-store.js")
 
 Page({
   data: {
@@ -100,35 +100,8 @@ Page({
 
   // 加载个人页数据
   loadData() {
-    let posts = wx.getStorageSync("forum_posts")
-
-    if (!posts || posts.length === 0) {
-      posts = forumData.postList || []
-    }
-
-    posts = mockComments.fillMockComments(posts)
-
-    // 兼容旧数据，避免字段缺失导致页面报错
-    posts = posts.map(item => {
-      return Object.assign({
-        view: 0,
-        like: 0,
-        collect: 0,
-        commentCount: 0,
-        isLiked: false,
-        isCollected: false,
-        isMine: false,
-        comments: [],
-        postImg: ""
-      }, item)
-    })
-
-    const userResult = mockUsers.fillMockUsers(posts)
-    posts = userResult.posts
-
-    wx.setStorageSync("forum_posts", posts)
-
-    const myPostIds = wx.getStorageSync("forum_my_posts") || []
+    const posts = forumStore.getPosts()
+    const myPostIds = forumStore.getMyPostIds()
 
     const myPostList = posts.filter(item => {
       return item.isMine || myPostIds.includes(item.postId)

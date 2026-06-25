@@ -1,4 +1,5 @@
 const forumData = require("../../data/forum-data.js")
+const forumStore = require("../../utils/forum-store.js")
 
 Page({
   data: {
@@ -120,12 +121,6 @@ Page({
       return
     }
 
-    let posts = wx.getStorageSync("forum_posts")
-
-    if (!posts || posts.length === 0) {
-      posts = forumData.postList || []
-    }
-
     const newPostId = Date.now()
 
     let finalContent = content
@@ -153,13 +148,8 @@ Page({
       comments: []
     }
 
-    posts.unshift(newPost)
-
-    wx.setStorageSync("forum_posts", posts)
-
-    const myPostIds = wx.getStorageSync("forum_my_posts") || []
-    myPostIds.unshift(newPostId)
-    wx.setStorageSync("forum_my_posts", myPostIds)
+    forumStore.addPost(newPost)
+    forumStore.addMyPostId(newPostId)
 
     wx.showToast({
       title: "发布成功",
