@@ -1,6 +1,8 @@
 const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
 const forumStore = require("../../utils/forum-store.js")
+const commentStore = require("../../utils/comment-store.js")
+const mockUsers = require("../../utils/mock-users.js")
 const profileNav = require("../../utils/profile-nav.js")
 
 Page({
@@ -10,7 +12,7 @@ Page({
       avatar: "/images/avatar/default.png"
     },
 
-    currentTab: "my",
+    currentTab: "published",
     currentCategory: "全部",
     keyword: "",
 
@@ -31,6 +33,7 @@ Page({
     myPostList: [],
     collectList: [],
     likeList: [],
+    myCommentList: [],
     showList: [],
 
     tabTitle: "我的发布",
@@ -110,6 +113,7 @@ Page({
     const collectList = posts.filter(item => item.isCollected)
 
     const likeList = posts.filter(item => item.isLiked)
+    const myCommentList = this.getMyComments(posts)
 
     // 统计“我发布的帖子”收到的数据
     let myViewCount = 0
@@ -127,6 +131,7 @@ Page({
       myPostList: myPostList,
       collectList: collectList,
       likeList: likeList,
+      myCommentList: myCommentList,
       myViewCount: myViewCount,
       myLikeReceivedCount: myLikeReceivedCount,
       myCollectReceivedCount: myCollectReceivedCount
@@ -185,19 +190,28 @@ Page({
     let tabTitle = ""
     let emptyText = ""
 
-    if (currentTab === "my") {
+    if (currentTab === "comments") {
+      this.setData({
+        showList: [],
+        tabTitle: "我的评论",
+        emptyText: "还没有发表过评论"
+      })
+      return
+    }
+
+    if (currentTab === "published") {
       baseList = myPostList
       tabTitle = "我的发布"
       emptyText = "还没有发布过帖子"
     }
 
-    if (currentTab === "collect") {
+    if (currentTab === "collected") {
       baseList = collectList
       tabTitle = "我的收藏"
       emptyText = "还没有收藏帖子"
     }
 
-    if (currentTab === "like") {
+    if (currentTab === "liked") {
       baseList = likeList
       tabTitle = "我的点赞"
       emptyText = "还没有点赞帖子"
@@ -232,6 +246,62 @@ Page({
   // 点击帖子进入详情页
   onTapPost(event) {
     const postId = event.currentTarget.dataset.postId
+
+    wx.navigateTo({
+      url: "/pages/detail/detail?postId=" + postId
+    })
+  },
+
+  getMyComments(posts) {
+    const postMap = this.createPostMap(posts)
+    const comments = commentStore.getComments()
+
+    return comments
+      .filter(comment => this.isMyComment(comment))
+      .map(comment => {
+        const post = postMap[String(comment.postId)]
+        const postAvailable = Boolean(post)
+
+        return Object.assign({}, comment, {
+          postTitle: postAvailable ? post.title : "原帖已不可用",
+          postAvailable: postAvailable
+        })
+      })
+  },
+
+  createPostMap(posts) {
+    const result = {}
+    const list = Array.isArray(posts) ? posts : []
+
+    list.forEach(post => {
+      result[String(post.postId)] = post
+    })
+
+    return result
+  },
+
+  isMyComment(comment) {
+    const authorId = String(comment && comment.authorId || "")
+    const author = String(comment && comment.author || "").trim()
+    const nickname = String(this.data.user && this.data.user.nickname || "").trim()
+
+    return authorId === mockUsers.CURRENT_USER_ID ||
+      author === "当前用户" ||
+      Boolean(nickname && author === nickname)
+  },
+
+  onTapComment(event) {
+    const postId = event.currentTarget.dataset.postId
+    const available = event.currentTarget.dataset.available === true ||
+      event.currentTarget.dataset.available === "true"
+
+    if (!available) {
+      wx.showToast({
+        title: "原帖已不可用",
+        icon: "none"
+      })
+      return
+    }
 
     wx.navigateTo({
       url: "/pages/detail/detail?postId=" + postId

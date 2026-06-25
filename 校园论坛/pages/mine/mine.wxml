@@ -29,88 +29,121 @@
     </view>
   </view>
 
-  <!-- 发布 / 收藏 / 点赞切换栏 -->
+  <!-- 发布 / 收藏 / 点赞 / 评论切换栏 -->
   <view class="tab-card">
-    <view class="tab-item {{currentTab === 'my' ? 'tab-active' : ''}}" data-tab="my" bindtap="onChangeTab">
+    <view class="tab-item {{currentTab === 'published' ? 'tab-active' : ''}}" data-tab="published" bindtap="onChangeTab">
       <view class="tab-main">
-        <image class="tab-icon" src="{{currentTab === 'my' ? '/images/icon/edit-active.png' : '/images/icon/edit.png'}}" mode="aspectFit"></image>
+        <image class="tab-icon" src="{{currentTab === 'published' ? '/images/icon/edit-active.png' : '/images/icon/edit.png'}}" mode="aspectFit"></image>
         <text>我的发布</text>
       </view>
       <view class="tab-num">{{myPostList.length}}</view>
     </view>
 
-    <view class="tab-item {{currentTab === 'collect' ? 'tab-active' : ''}}" data-tab="collect" bindtap="onChangeTab">
+    <view class="tab-item {{currentTab === 'collected' ? 'tab-active' : ''}}" data-tab="collected" bindtap="onChangeTab">
       <view class="tab-main">
-        <image class="tab-icon" src="{{currentTab === 'collect' ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" mode="aspectFit"></image>
+        <image class="tab-icon" src="{{currentTab === 'collected' ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" mode="aspectFit"></image>
         <text>我的收藏</text>
       </view>
       <view class="tab-num">{{collectList.length}}</view>
     </view>
 
-    <view class="tab-item {{currentTab === 'like' ? 'tab-active' : ''}}" data-tab="like" bindtap="onChangeTab">
+    <view class="tab-item {{currentTab === 'liked' ? 'tab-active' : ''}}" data-tab="liked" bindtap="onChangeTab">
       <view class="tab-main">
-        <image class="tab-icon" src="{{currentTab === 'like' ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" mode="aspectFit"></image>
+        <image class="tab-icon" src="{{currentTab === 'liked' ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" mode="aspectFit"></image>
         <text>我的点赞</text>
       </view>
       <view class="tab-num">{{likeList.length}}</view>
     </view>
-  </view>
 
-  <!-- 搜索框 -->
-  <view class="search-box">
-    <view class="search-inner">
-      <image class="search-icon" src="{{keyword ? '/images/icon/search-active.png' : '/images/icon/search.png'}}" mode="aspectFit"></image>
-
-      <input class="search-input" placeholder="搜索当前列表中的帖子" value="{{keyword}}" bindinput="onSearchInput" />
+    <view class="tab-item {{currentTab === 'comments' ? 'tab-active' : ''}}" data-tab="comments" bindtap="onChangeTab">
+      <view class="tab-main">
+        <image class="tab-icon" src="{{currentTab === 'comments' ? '/images/icon/comment-active.png' : '/images/icon/comment.png'}}" mode="aspectFit"></image>
+        <text>我的评论</text>
+      </view>
+      <view class="tab-num">{{myCommentList.length}}</view>
     </view>
   </view>
 
-  <!-- 分类标题 -->
-  <view class="category-title">
-    <image class="category-title-icon" src="{{currentCategory === '全部' ? '/images/icon/category.png' : '/images/icon/category-active.png'}}" mode="aspectFit"></image>
-    <text>分类筛选</text>
-  </view>
+  <block wx:if="{{currentTab !== 'comments'}}">
+    <!-- 搜索框 -->
+    <view class="search-box">
+      <view class="search-inner">
+        <image class="search-icon" src="{{keyword ? '/images/icon/search-active.png' : '/images/icon/search.png'}}" mode="aspectFit"></image>
 
-  <!-- 分类栏 -->
-  <scroll-view class="category-scroll" scroll-x>
-    <view class="category-list">
-      <block wx:for="{{categoryList}}" wx:key="id">
-        <view class="category-item {{currentCategory === item.name ? 'category-active' : ''}}" data-category="{{item.name}}" bindtap="onTapCategory">
-          {{item.name}}
+        <input class="search-input" placeholder="搜索当前列表中的帖子" value="{{keyword}}" bindinput="onSearchInput" />
+      </view>
+    </view>
+
+    <!-- 分类标题 -->
+    <view class="category-title">
+      <image class="category-title-icon" src="{{currentCategory === '全部' ? '/images/icon/category.png' : '/images/icon/category-active.png'}}" mode="aspectFit"></image>
+      <text>分类筛选</text>
+    </view>
+
+    <!-- 分类栏 -->
+    <scroll-view class="category-scroll" scroll-x>
+      <view class="category-list">
+        <block wx:for="{{categoryList}}" wx:key="id">
+          <view class="category-item {{currentCategory === item.name ? 'category-active' : ''}}" data-category="{{item.name}}" bindtap="onTapCategory">
+            {{item.name}}
+          </view>
+        </block>
+      </view>
+    </scroll-view>
+
+    <!-- 当前筛选提示 -->
+    <view class="filter-tip" wx:if="{{currentCategory !== '全部' || keyword !== ''}}">
+      <text wx:if="{{currentCategory !== '全部'}}">{{currentCategory}}</text>
+      <text wx:if="{{keyword !== ''}}">{{currentCategory !== '全部' ? ' · ' : ''}}搜索：{{keyword}}</text>
+    </view>
+
+    <!-- 排序功能区 -->
+    <view class="sort-card">
+      <view class="sort-row">
+        <view class="sort-item">
+          <text class="sort-label">时间</text>
+          <picker mode="selector" range="{{timeRangeNames}}" value="{{timeRangeIndex}}" bindchange="onTimeRangeChange">
+            <view class="sort-picker">{{timeRangeNames[timeRangeIndex]}}</view>
+          </picker>
         </view>
-      </block>
-    </view>
-  </scroll-view>
 
-  <!-- 当前筛选提示 -->
-  <view class="filter-tip">
-    <text>{{tabTitle}}</text>
-    <text wx:if="{{currentCategory !== '全部'}}"> · {{currentCategory}}</text>
-    <text wx:if="{{keyword !== ''}}"> · 搜索：{{keyword}}</text>
-  </view>
-
-  <!-- 排序功能区 -->
-  <view class="sort-card">
-    <view class="sort-row">
-      <view class="sort-item">
-        <text class="sort-label">时间</text>
-        <picker mode="selector" range="{{timeRangeNames}}" value="{{timeRangeIndex}}" bindchange="onTimeRangeChange">
-          <view class="sort-picker">{{timeRangeNames[timeRangeIndex]}}</view>
-        </picker>
-      </view>
-
-      <view class="sort-item">
-        <text class="sort-label">排序</text>
-        <image class="sort-icon" src="/images/icon/sort.png" mode="aspectFit"></image>
-        <picker mode="selector" range="{{sortNames}}" value="{{sortIndex}}" bindchange="onSortChange">
-          <view class="sort-picker">{{sortNames[sortIndex]}}</view>
-        </picker>
+        <view class="sort-item">
+          <text class="sort-label">排序</text>
+          <image class="sort-icon" src="/images/icon/sort.png" mode="aspectFit"></image>
+          <picker mode="selector" range="{{sortNames}}" value="{{sortIndex}}" bindchange="onSortChange">
+            <view class="sort-picker">{{sortNames[sortIndex]}}</view>
+          </picker>
+        </view>
       </view>
     </view>
-  </view>
+  </block>
 
   <!-- 列表 -->
-  <view class="list-card">
+  <view wx:if="{{currentTab !== 'comments'}}" class="list-card">
+    <view class="mine-list-title">{{tabTitle}}</view>
     <template is="postList" data="{{list: showList, emptyText: emptyText}}" />
+  </view>
+
+  <view wx:else class="comment-list">
+    <view class="mine-list-title">{{tabTitle}}</view>
+    <block wx:if="{{myCommentList && myCommentList.length > 0}}">
+      <block wx:for="{{myCommentList}}" wx:key="commentId">
+        <view
+          class="comment-card"
+          bindtap="onTapComment"
+          data-post-id="{{item.postId}}"
+          data-available="{{item.postAvailable}}"
+        >
+          <view class="comment-post">我评论了《{{item.postTitle}}》</view>
+          <view class="comment-content">{{item.content}}</view>
+          <view class="comment-date">{{item.date}}</view>
+        </view>
+      </block>
+    </block>
+
+    <view wx:else class="comment-empty">
+      <image class="comment-empty-icon" src="/images/icon/empty.png" mode="aspectFit"></image>
+      <view>{{emptyText}}</view>
+    </view>
   </view>
 </view>
