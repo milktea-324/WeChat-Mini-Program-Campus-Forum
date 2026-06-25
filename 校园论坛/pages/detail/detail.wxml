@@ -9,7 +9,7 @@
         data-is-current-user="{{post.authorInfo.isCurrentUser}}"
         data-author-name="{{post.author}}"
       >
-        <image class="avatar" src="{{post.avatar}}" mode="aspectFill"></image>
+        <image class="avatar" src="{{post.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
       </view>
 
       <view class="author-box">
@@ -70,12 +70,12 @@
     </view>
 
     <view wx:if="{{commentList.length === 0}}" class="empty-comment">
-      还没有评论，来写第一条吧
+      暂无评论，来写第一条评论吧
     </view>
 
     <block wx:for="{{commentList}}" wx:key="commentId">
       <view class="comment-item">
-        <image class="comment-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+        <image class="comment-avatar" src="{{item.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
 
         <view class="comment-main">
           <view class="comment-top">

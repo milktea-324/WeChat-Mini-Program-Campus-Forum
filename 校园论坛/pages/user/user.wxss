@@ -6,7 +6,7 @@ page {
 
 .page {
   min-height: 100vh;
-  padding: 24rpx;
+  padding: 24rpx 24rpx calc(140rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
@@ -28,6 +28,7 @@ page {
 
 .profile-main {
   flex: 1;
+  min-width: 0;
   margin-left: 24rpx;
 }
 
@@ -35,6 +36,9 @@ page {
   font-size: 38rpx;
   font-weight: bold;
   line-height: 48rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bio {
@@ -42,6 +46,12 @@ page {
   font-size: 25rpx;
   line-height: 38rpx;
   opacity: 0.9;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-all;
 }
 
 .tag-row {
@@ -51,12 +61,16 @@ page {
 }
 
 .profile-tag {
+  max-width: 190rpx;
   margin-right: 12rpx;
   margin-bottom: 10rpx;
   padding: 6rpx 14rpx;
   border-radius: 20rpx;
   background-color: rgba(255, 255, 255, 0.18);
   font-size: 22rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stat-card {

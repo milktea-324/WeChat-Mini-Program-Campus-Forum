@@ -4,7 +4,7 @@ page {
 
 .page {
   min-height: 100vh;
-  padding: 24rpx 24rpx 140rpx;
+  padding: 24rpx 24rpx calc(170rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
@@ -37,6 +37,7 @@ page {
 
 .author-box {
   flex: 1;
+  min-width: 0;
   margin-left: 18rpx;
   display: flex;
   flex-direction: column;
@@ -46,20 +47,30 @@ page {
   font-size: 30rpx;
   color: #222222;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .date {
   margin-top: 6rpx;
   font-size: 22rpx;
   color: #999999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .category {
+  max-width: 180rpx;
   padding: 8rpx 18rpx;
   border-radius: 22rpx;
   background-color: #edf4ff;
   color: #2f80ed;
   font-size: 22rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .title {
@@ -68,6 +79,7 @@ page {
   font-weight: bold;
   color: #222222;
   line-height: 56rpx;
+  word-break: break-all;
 }
 
 .post-img {
@@ -89,6 +101,7 @@ page {
 /* 2026年6月23日14点55分 详情页样式追加 */
 .count-row {
   display: flex;
+  flex-wrap: wrap;
   margin-top: 30rpx;
   padding-top: 20rpx;
   border-top: 1rpx solid #eeeeee;
@@ -216,6 +229,7 @@ page {
 
 .comment-main {
   flex: 1;
+  min-width: 0;
   margin-left: 18rpx;
 }
 
@@ -226,14 +240,19 @@ page {
 
 .comment-author {
   flex: 1;
+  min-width: 0;
   font-size: 26rpx;
   color: #333333;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .comment-date {
   font-size: 22rpx;
   color: #999999;
+  flex-shrink: 0;
 }
 
 .comment-content {
@@ -241,6 +260,7 @@ page {
   font-size: 28rpx;
   color: #555555;
   line-height: 42rpx;
+  word-break: break-all;
 }
 
 /* 底部输入栏 */
@@ -251,7 +271,7 @@ page {
   bottom: 0;
   display: flex;
   align-items: center;
-  padding: 18rpx 24rpx;
+  padding: 18rpx 24rpx calc(18rpx + env(safe-area-inset-bottom));
   background-color: #ffffff;
   box-shadow: 0 -4rpx 18rpx rgba(0, 0, 0, 0.06);
   box-sizing: border-box;

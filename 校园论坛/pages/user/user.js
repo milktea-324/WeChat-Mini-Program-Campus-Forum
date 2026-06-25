@@ -6,7 +6,7 @@ Page({
     authorId: "",
     user: null,
     authorPosts: [],
-    emptyText: "这个作者还没有发布帖子"
+    emptyText: "TA 还没有发布帖子"
   },
 
   onLoad(options) {
@@ -49,7 +49,7 @@ Page({
     this.setData({
       user: user,
       authorPosts: user.posts,
-      emptyText: user.nickname + "还没有发布帖子"
+      emptyText: "TA 还没有发布帖子"
     })
   },
 

@@ -3,7 +3,7 @@
 <view class="page">
   <!-- 用户信息 -->
   <view class="user-card">
-    <image class="user-avatar" src="{{user.avatar}}" mode="aspectFill"></image>
+    <image class="user-avatar" src="{{user.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
 
     <view class="user-info">
       <view class="nickname">{{user.nickname}}</view>

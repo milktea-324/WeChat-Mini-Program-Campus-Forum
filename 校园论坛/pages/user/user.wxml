@@ -2,7 +2,7 @@
 
 <view class="page" wx:if="{{user}}">
   <view class="profile-card">
-    <image class="profile-avatar" src="{{user.avatar}}" mode="aspectFill"></image>
+    <image class="profile-avatar" src="{{user.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
 
     <view class="profile-main">
       <view class="nickname">{{user.nickname}}</view>

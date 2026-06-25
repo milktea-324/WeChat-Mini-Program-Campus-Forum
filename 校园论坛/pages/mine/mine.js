@@ -188,19 +188,19 @@ Page({
     if (currentTab === "my") {
       baseList = myPostList
       tabTitle = "我的发布"
-      emptyText = "你还没有发布帖子"
+      emptyText = "还没有发布过帖子"
     }
 
     if (currentTab === "collect") {
       baseList = collectList
       tabTitle = "我的收藏"
-      emptyText = "你还没有收藏帖子"
+      emptyText = "还没有收藏帖子"
     }
 
     if (currentTab === "like") {
       baseList = likeList
       tabTitle = "我的点赞"
-      emptyText = "你还没有点赞帖子"
+      emptyText = "还没有点赞帖子"
     }
 
     const timeRange = timeRangeList[timeRangeIndex]

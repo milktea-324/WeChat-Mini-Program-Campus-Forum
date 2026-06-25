@@ -16,7 +16,7 @@
               data-is-current-user="{{item.authorInfo.isCurrentUser}}"
               data-author-name="{{item.author}}"
             >
-              <image class="forum-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+              <image class="forum-avatar" src="{{item.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
             </view>
 
             <view class="forum-user-info">
@@ -77,7 +77,8 @@
     </block>
 
     <view wx:else class="forum-empty">
-      {{emptyText}}
+      <image class="forum-empty-icon" src="/images/icon/empty.png" mode="aspectFit"></image>
+      <view>{{emptyText || '暂无帖子'}}</view>
     </view>
   </view>
 </template>
