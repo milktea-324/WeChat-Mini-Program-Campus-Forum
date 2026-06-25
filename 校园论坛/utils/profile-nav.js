@@ -3,6 +3,7 @@ const mockUsers = require("./mock-users.js")
 const MINE_PAGE_URL = "/pages/mine/mine"
 const USER_PAGE_ROUTE = "pages/user/user"
 const USER_PAGE_URL = "/pages/user/user"
+const MAX_SAFE_STACK_DEPTH = 8
 
 function getTargetUserId(target) {
   return String(target && (target.userId || target.authorId) || "").trim()
@@ -95,10 +96,26 @@ function goUserProfile(target) {
     return true
   }
 
+  for (let index = pages.length - 3; index >= 0; index--) {
+    if (isSameAuthorPage(pages[index], userId)) {
+      wx.navigateBack({
+        delta: pages.length - 1 - index
+      })
+      return true
+    }
+  }
+
   const url = buildUserProfileUrl(target)
 
   if (!url) {
     return false
+  }
+
+  if (pages.length >= MAX_SAFE_STACK_DEPTH) {
+    wx.redirectTo({
+      url: url
+    })
+    return true
   }
 
   wx.navigateTo({

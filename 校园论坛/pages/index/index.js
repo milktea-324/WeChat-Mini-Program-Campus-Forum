@@ -2,6 +2,7 @@ const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
 const forumStore = require("../../utils/forum-store.js")
 const profileNav = require("../../utils/profile-nav.js")
+const routeNav = require("../../utils/route-nav.js")
 
 Page({
   data: {
@@ -115,9 +116,7 @@ Page({
       return
     }
 
-    wx.navigateTo({
-      url: "/pages/detail/detail?postId=" + postId
-    })
+    routeNav.goPostDetail(postId)
   },
 
   // 搜索输入
@@ -176,9 +175,7 @@ Page({
   onTapPost(event) {
     const postId = event.currentTarget.dataset.postId
 
-    wx.navigateTo({
-      url: "/pages/detail/detail?postId=" + postId
-    })
+    routeNav.goPostDetail(postId)
   },
 
   // 点击作者头像进入作者主页

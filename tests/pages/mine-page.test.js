@@ -16,6 +16,7 @@ function loadMinePage(storage) {
 
   const calls = []
   const data = storage || {}
+  let pages = []
   let pageDefinition = null
 
   global.Page = function(definition) {
@@ -23,7 +24,7 @@ function loadMinePage(storage) {
   }
 
   global.getCurrentPages = function() {
-    return []
+    return pages
   }
 
   global.wx = {
@@ -35,6 +36,12 @@ function loadMinePage(storage) {
     },
     navigateTo(options) {
       calls.push({ type: "navigateTo", options })
+    },
+    redirectTo(options) {
+      calls.push({ type: "redirectTo", options })
+    },
+    navigateBack(options) {
+      calls.push({ type: "navigateBack", options })
     },
     showToast(options) {
       calls.push({ type: "showToast", options })
@@ -59,7 +66,10 @@ function loadMinePage(storage) {
   return {
     page,
     calls,
-    storage: data
+    storage: data,
+    setPages(nextPages) {
+      pages = nextPages || []
+    }
   }
 }
 
@@ -141,6 +151,30 @@ context.page.onTapComment({
 assert.deepStrictEqual(context.calls[context.calls.length - 1], {
   type: "navigateTo",
   options: { url: "/pages/detail/detail?postId=10" }
+})
+
+context.setPages([
+  {
+    route: "pages/detail/detail",
+    options: { postId: "10" }
+  },
+  {
+    route: "pages/mine/mine",
+    options: {}
+  }
+])
+
+context.page.onTapPost({
+  currentTarget: {
+    dataset: {
+      postId: 10
+    }
+  }
+})
+
+assert.deepStrictEqual(context.calls[context.calls.length - 1], {
+  type: "navigateBack",
+  options: { delta: 1 }
 })
 
 context.page.onTapComment({

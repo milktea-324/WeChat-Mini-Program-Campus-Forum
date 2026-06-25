@@ -19,6 +19,9 @@ function resetEnv(pages) {
     navigateTo(options) {
       calls.push({ type: "navigateTo", options })
     },
+    redirectTo(options) {
+      calls.push({ type: "redirectTo", options })
+    },
     navigateBack(options) {
       calls.push({ type: "navigateBack", options })
     }
@@ -73,6 +76,34 @@ assert.deepStrictEqual(context.calls, [{
   options: { delta: 1 }
 }])
 
+context = resetEnv([
+  {
+    route: "pages/user/user",
+    options: { authorId: "user-lin" }
+  },
+  {
+    route: "pages/detail/detail",
+    options: { postId: "1" }
+  },
+  {
+    route: "pages/user/user",
+    options: { authorId: "user-zhou" }
+  },
+  {
+    route: "pages/detail/detail",
+    options: { postId: "2" }
+  }
+])
+
+assert.strictEqual(context.nav.goUserProfile({
+  userId: "user-lin",
+  nickname: "林同学"
+}), true)
+assert.deepStrictEqual(context.calls, [{
+  type: "navigateBack",
+  options: { delta: 3 }
+}])
+
 context = resetEnv([{
   route: "pages/index/index",
   options: {}
@@ -89,6 +120,26 @@ assert.strictEqual(
   context.calls[0].options.url,
   "/pages/user/user?authorId=comment-author-1&nickname=%E8%AF%84%E8%AE%BA%20%E5%90%8C%E5%AD%A6&avatar=%2Fimages%2Favatar%2F1.png"
 )
+
+context = resetEnv([
+  { route: "pages/index/index", options: {} },
+  { route: "pages/detail/detail", options: { postId: "1" } },
+  { route: "pages/user/user", options: { authorId: "user-1" } },
+  { route: "pages/detail/detail", options: { postId: "2" } },
+  { route: "pages/user/user", options: { authorId: "user-2" } },
+  { route: "pages/detail/detail", options: { postId: "3" } },
+  { route: "pages/user/user", options: { authorId: "user-3" } },
+  { route: "pages/detail/detail", options: { postId: "4" } }
+])
+
+assert.strictEqual(context.nav.goUserProfile({
+  userId: "user-new",
+  nickname: "新同学"
+}), true)
+assert.deepStrictEqual(context.calls, [{
+  type: "redirectTo",
+  options: { url: "/pages/user/user?authorId=user-new&nickname=%E6%96%B0%E5%90%8C%E5%AD%A6" }
+}])
 
 context = resetEnv([])
 

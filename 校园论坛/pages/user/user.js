@@ -2,6 +2,7 @@ const mockUsers = require("../../utils/mock-users.js")
 const forumStore = require("../../utils/forum-store.js")
 const commentStore = require("../../utils/comment-store.js")
 const profileNav = require("../../utils/profile-nav.js")
+const routeNav = require("../../utils/route-nav.js")
 
 Page({
   data: {
@@ -198,9 +199,7 @@ Page({
   onTapPost(event) {
     const postId = event.currentTarget.dataset.postId
 
-    wx.navigateTo({
-      url: "/pages/detail/detail?postId=" + postId
-    })
+    routeNav.goPostDetail(postId)
   },
 
   onChangeTab(event) {
@@ -229,9 +228,7 @@ Page({
       return
     }
 
-    wx.navigateTo({
-      url: "/pages/detail/detail?postId=" + postId
-    })
+    routeNav.goPostDetail(postId)
   },
 
   // 作者页内点击当前作者头像时留在当前页

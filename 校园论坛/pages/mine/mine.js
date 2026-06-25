@@ -4,6 +4,7 @@ const forumStore = require("../../utils/forum-store.js")
 const commentStore = require("../../utils/comment-store.js")
 const mockUsers = require("../../utils/mock-users.js")
 const profileNav = require("../../utils/profile-nav.js")
+const routeNav = require("../../utils/route-nav.js")
 
 Page({
   data: {
@@ -247,9 +248,7 @@ Page({
   onTapPost(event) {
     const postId = event.currentTarget.dataset.postId
 
-    wx.navigateTo({
-      url: "/pages/detail/detail?postId=" + postId
-    })
+    routeNav.goPostDetail(postId)
   },
 
   getMyComments(posts) {
@@ -303,9 +302,7 @@ Page({
       return
     }
 
-    wx.navigateTo({
-      url: "/pages/detail/detail?postId=" + postId
-    })
+    routeNav.goPostDetail(postId)
   },
 
   // 点击作者头像进入作者主页

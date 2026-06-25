@@ -12,6 +12,7 @@ function loadUserPage(storage) {
 
   const calls = []
   const data = storage || {}
+  let pages = []
   let pageDefinition = null
 
   global.Page = function(definition) {
@@ -19,7 +20,7 @@ function loadUserPage(storage) {
   }
 
   global.getCurrentPages = function() {
-    return []
+    return pages
   }
 
   global.wx = {
@@ -43,6 +44,9 @@ function loadUserPage(storage) {
     },
     navigateTo(options) {
       calls.push({ type: "navigateTo", options })
+    },
+    redirectTo(options) {
+      calls.push({ type: "redirectTo", options })
     }
   }
 
@@ -64,7 +68,10 @@ function loadUserPage(storage) {
   return {
     page,
     calls,
-    storage: data
+    storage: data,
+    setPages(nextPages) {
+      pages = nextPages || []
+    }
   }
 }
 
@@ -185,6 +192,30 @@ context.page.onTapComment({
 assert.deepStrictEqual(context.calls[context.calls.length - 1], {
   type: "navigateTo",
   options: { url: "/pages/detail/detail?postId=10" }
+})
+
+context.setPages([
+  {
+    route: "pages/detail/detail",
+    options: { postId: "10" }
+  },
+  {
+    route: "pages/user/user",
+    options: { authorId: "comment-author-abc" }
+  }
+])
+
+context.page.onTapPost({
+  currentTarget: {
+    dataset: {
+      postId: 10
+    }
+  }
+})
+
+assert.deepStrictEqual(context.calls[context.calls.length - 1], {
+  type: "navigateBack",
+  options: { delta: 1 }
 })
 
 context.page.onTapComment({
