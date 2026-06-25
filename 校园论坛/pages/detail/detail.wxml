@@ -66,14 +66,14 @@
   <view class="comment-card">
     <view class="comment-title">
       <text>评论</text>
-      <text class="comment-count">{{post.comments.length}}</text>
+      <text class="comment-count">{{commentList.length}}</text>
     </view>
 
-    <view wx:if="{{post.comments.length === 0}}" class="empty-comment">
+    <view wx:if="{{commentList.length === 0}}" class="empty-comment">
       还没有评论，来写第一条吧
     </view>
 
-    <block wx:for="{{post.comments}}" wx:key="commentId">
+    <block wx:for="{{commentList}}" wx:key="commentId">
       <view class="comment-item">
         <image class="comment-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
 

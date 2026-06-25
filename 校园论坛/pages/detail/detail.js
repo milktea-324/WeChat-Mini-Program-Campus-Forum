@@ -1,10 +1,12 @@
 const mockUsers = require("../../utils/mock-users.js")
 const forumStore = require("../../utils/forum-store.js")
+const commentStore = require("../../utils/comment-store.js")
 
 Page({
   data: {
     postId: null,
     post: null,
+    commentList: [],
     commentText: ""
   },
 
@@ -58,9 +60,7 @@ Page({
       return
     }
 
-    this.setData({
-      post: post
-    })
+    this.refreshPostComments(post)
   },
 
   // 更新当前帖子并写回缓存
@@ -73,6 +73,22 @@ Page({
 
     this.setData({
       post: post
+    })
+  },
+
+  // 刷新当前帖子的独立评论列表
+  refreshPostComments(post) {
+    const targetPost = post || this.data.post
+
+    if (!targetPost) {
+      return
+    }
+
+    const commentList = commentStore.getCommentsByPostId(this.data.postId)
+
+    this.setData({
+      post: targetPost,
+      commentList: commentList
     })
   },
 
@@ -156,28 +172,29 @@ Page({
       return
     }
 
-    const comments = post.comments || []
-
-    const newComment = {
-      commentId: Date.now(),
+    const newComment = commentStore.createComment(this.data.postId, text, {
+      authorId: mockUsers.CURRENT_USER_ID,
       author: "当前用户",
       avatar: "/images/avatar/default.png",
-      content: text,
       date: this.getToday()
-    }
-
-    const newComments = comments.concat(newComment)
-
-    const newPost = Object.assign({}, post, {
-      comments: newComments,
-      commentCount: newComments.length
     })
 
-    this.updateCurrentPost(newPost)
+    commentStore.addComment(newComment)
+
+    const nextComments = commentStore.getCommentsByPostId(this.data.postId)
+    const commentCount = commentStore.getCommentCountByPostId(this.data.postId)
+    const updatedPost = forumStore.updatePostById(this.data.postId, item => {
+      return Object.assign({}, item, {
+        comments: nextComments,
+        commentCount: commentCount
+      })
+    })
 
     this.setData({
       commentText: ""
     })
+
+    this.refreshPostComments(updatedPost || post)
 
     wx.showToast({
       title: "评论成功",

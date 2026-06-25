@@ -171,11 +171,60 @@ function getCommentCountByPostId(postId) {
   return getCommentsByPostId(postId).filter(isActiveComment).length
 }
 
+function padDatePart(value) {
+  return String(value).padStart(2, "0")
+}
+
+function getToday() {
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = padDatePart(date.getMonth() + 1)
+  const day = padDatePart(date.getDate())
+
+  return year + "-" + month + "-" + day
+}
+
+function createComment(postId, content, authorInfo) {
+  const info = authorInfo || {}
+  const date = info.date || getToday()
+  const createdAt = info.createdAt || date
+
+  return normalizeComment({
+    commentId: info.commentId || Date.now(),
+    postId: postId,
+    authorId: info.authorId || mockUsers.CURRENT_USER_ID,
+    author: info.author || "当前用户",
+    avatar: info.avatar || DEFAULT_AVATAR,
+    content: content,
+    createdAt: createdAt,
+    date: date,
+    parentCommentId: null,
+    rootCommentId: null,
+    level: 1,
+    likeCount: 0,
+    dislikeCount: 0,
+    isLiked: false,
+    isDisliked: false,
+    status: "active"
+  })
+}
+
+function addComment(comment) {
+  const comments = getComments()
+  const safeComment = normalizeComment(comment)
+
+  saveComments(comments.concat(safeComment))
+
+  return safeComment
+}
+
 module.exports = {
   getComments,
   saveComments,
   getCommentsByPostId,
   migrateCommentsFromPosts,
   normalizeComment,
-  getCommentCountByPostId
+  getCommentCountByPostId,
+  createComment,
+  addComment
 }

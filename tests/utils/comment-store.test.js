@@ -177,6 +177,50 @@ assert.deepStrictEqual(context.storage.forum_comments, [])
 assert.deepStrictEqual(context.store.getCommentsByPostId(3), [])
 assert.strictEqual(context.store.getCommentCountByPostId(3), 0)
 
+context = resetStore({
+  forum_comments: [
+    {
+      commentId: "existing-1",
+      postId: 7,
+      author: "已有评论",
+      content: "已经在缓存中",
+      status: "active"
+    }
+  ],
+  forum_posts: []
+})
+
+const createdComment = context.store.createComment(7, "新评论", {
+  authorId: "current-user",
+  author: "当前用户",
+  avatar: "/images/avatar/default.png",
+  createdAt: "2026-06-25 10:30:00",
+  date: "2026-06-25"
+})
+
+assert.ok(createdComment.commentId)
+assert.strictEqual(createdComment.postId, 7)
+assert.strictEqual(createdComment.authorId, "current-user")
+assert.strictEqual(createdComment.author, "当前用户")
+assert.strictEqual(createdComment.avatar, "/images/avatar/default.png")
+assert.strictEqual(createdComment.content, "新评论")
+assert.strictEqual(createdComment.createdAt, "2026-06-25 10:30:00")
+assert.strictEqual(createdComment.date, "2026-06-25")
+assert.strictEqual(createdComment.parentCommentId, null)
+assert.strictEqual(createdComment.rootCommentId, null)
+assert.strictEqual(createdComment.level, 1)
+assert.strictEqual(createdComment.likeCount, 0)
+assert.strictEqual(createdComment.dislikeCount, 0)
+assert.strictEqual(createdComment.isLiked, false)
+assert.strictEqual(createdComment.isDisliked, false)
+assert.strictEqual(createdComment.status, "active")
+
+const addedComment = context.store.addComment(createdComment)
+assert.strictEqual(addedComment.commentId, createdComment.commentId)
+assert.strictEqual(context.storage.forum_comments.length, 2)
+assert.strictEqual(context.store.getCommentsByPostId(7).length, 2)
+assert.strictEqual(context.store.getCommentCountByPostId(7), 2)
+
 context = resetStore()
 assert.ok(Array.isArray(context.store.getComments()))
 
