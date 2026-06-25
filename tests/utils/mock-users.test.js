@@ -72,4 +72,36 @@ assert.strictEqual(
   "/pages/user/user?authorId=" + linUser.userId
 )
 
+const commentCountResult = mockUsers.fillMockUsers([
+  {
+    postId: 4,
+    author: "Count User",
+    commentCount: 5,
+    comments: [
+      { commentId: "c1", content: "one" },
+      { commentId: "c2", content: "two" }
+    ]
+  }
+])
+const countUser = commentCountResult.users.find(user => user.nickname === "Count User")
+
+assert.ok(countUser)
+assert.strictEqual(countUser.stats.commentCount, 5)
+
+const fallbackResult = mockUsers.fillMockUsers([
+  {
+    postId: 5,
+    author: "Fallback User",
+    commentCount: "bad-count",
+    comments: [
+      { commentId: "c1", content: "one" },
+      { commentId: "c2", content: "two" }
+    ]
+  }
+])
+const fallbackUser = fallbackResult.users.find(user => user.nickname === "Fallback User")
+
+assert.ok(fallbackUser)
+assert.strictEqual(fallbackUser.stats.commentCount, 2)
+
 console.log("mock-users tests passed")

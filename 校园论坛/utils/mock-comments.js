@@ -21,15 +21,25 @@ function createMockComment(postId, index, date) {
 }
 
 // 给帖子补全评论
+function getValidCommentCount(value) {
+  const count = Number(value)
+
+  if (!Number.isFinite(count) || count < 0) {
+    return null
+  }
+
+  return count
+}
+
 function fillMockComments(posts) {
   return posts.map(post => {
-    const commentCount = Number(post.commentCount || 0)
-    const comments = post.comments || []
+    const commentCount = getValidCommentCount(post.commentCount)
+    const comments = Array.isArray(post.comments) ? post.comments : []
 
     // 已经有评论，不重复生成
     if (comments.length > 0) {
       return Object.assign({}, post, {
-        commentCount: comments.length,
+        commentCount: commentCount > 0 ? commentCount : comments.length,
         comments: comments
       })
     }

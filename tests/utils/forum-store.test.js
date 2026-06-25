@@ -85,4 +85,49 @@ assert.strictEqual(posts[0].comments.length, 2)
 assert.strictEqual(posts[0].commentCount, 2)
 assert.strictEqual(posts[0].postImg, "")
 
+context = resetStore({
+  forum_posts: [{
+    postId: 100,
+    title: "comment count wins",
+    commentCount: 5,
+    comments: [
+      { commentId: "c1", author: "A", content: "one" },
+      { commentId: "c2", author: "B", content: "two" }
+    ]
+  }]
+})
+posts = context.store.getPosts()
+
+assert.strictEqual(posts[0].comments.length, 2)
+assert.strictEqual(posts[0].commentCount, 5)
+
+context = resetStore({
+  forum_posts: [{
+    postId: 101,
+    title: "comments fallback",
+    commentCount: "bad-count",
+    comments: [
+      { commentId: "c1", author: "A", content: "one" },
+      { commentId: "c2", author: "B", content: "two" }
+    ]
+  }]
+})
+posts = context.store.getPosts()
+
+assert.strictEqual(posts[0].comments.length, 2)
+assert.strictEqual(posts[0].commentCount, 2)
+
+context = resetStore({
+  forum_posts: [{
+    postId: 102,
+    title: "generate comments",
+    commentCount: 3,
+    comments: []
+  }]
+})
+posts = context.store.getPosts()
+
+assert.strictEqual(posts[0].comments.length, 3)
+assert.strictEqual(posts[0].commentCount, 3)
+
 console.log("forum-store tests passed")

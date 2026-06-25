@@ -85,11 +85,17 @@ function createStats() {
 }
 
 function getCommentCount(post) {
+  const commentCount = Number(post && post.commentCount)
+
+  if (Number.isFinite(commentCount) && commentCount >= 0) {
+    return commentCount
+  }
+
   if (post && post.comments && post.comments.length > 0) {
     return post.comments.length
   }
 
-  return Number(post && post.commentCount ? post.commentCount : 0)
+  return 0
 }
 
 function createUserFromPost(post) {
