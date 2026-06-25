@@ -8,6 +8,7 @@
         data-author-id="{{post.authorId}}"
         data-is-current-user="{{post.authorInfo.isCurrentUser}}"
         data-author-name="{{post.author}}"
+        data-avatar="{{post.avatar}}"
       >
         <image class="avatar" src="{{post.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
       </view>
@@ -75,7 +76,16 @@
 
     <block wx:for="{{commentList}}" wx:key="commentId">
       <view class="comment-item">
-        <image class="comment-avatar" src="{{item.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
+        <image
+          class="comment-avatar"
+          src="{{item.avatar || '/images/avatar/default.png'}}"
+          mode="aspectFill"
+          catchtap="onTapCommentAuthor"
+          data-comment-id="{{item.commentId}}"
+          data-author-id="{{item.authorId}}"
+          data-author-name="{{item.author}}"
+          data-avatar="{{item.avatar}}"
+        ></image>
 
         <view class="comment-main">
           <view class="comment-top">

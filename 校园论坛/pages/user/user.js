@@ -1,9 +1,12 @@
 const mockUsers = require("../../utils/mock-users.js")
 const forumStore = require("../../utils/forum-store.js")
+const profileNav = require("../../utils/profile-nav.js")
 
 Page({
   data: {
     authorId: "",
+    fallbackNickname: "",
+    fallbackAvatar: "",
     user: null,
     authorPosts: [],
     emptyText: "TA 还没有发布帖子"
@@ -11,14 +14,25 @@ Page({
 
   onLoad(options) {
     const authorId = options.authorId || ""
+    const fallbackNickname = decodeOption(options.nickname || "")
+    const fallbackAvatar = decodeOption(options.avatar || "")
 
-    if (!authorId || authorId === mockUsers.CURRENT_USER_ID) {
-      this.rejectUserPage()
+    if (!authorId) {
+      this.rejectUserPage("作者参数错误")
+      return
+    }
+
+    if (authorId === mockUsers.CURRENT_USER_ID) {
+      profileNav.goUserProfile({
+        userId: authorId
+      })
       return
     }
 
     this.setData({
-      authorId: authorId
+      authorId: authorId,
+      fallbackNickname: fallbackNickname,
+      fallbackAvatar: fallbackAvatar
     })
 
     this.loadUser(authorId)
@@ -37,8 +51,30 @@ Page({
 
     const user = mockUsers.findUserById(users, authorId)
 
-    if (!user || user.isCurrentUser) {
-      this.rejectUserPage()
+    if (user && user.isCurrentUser) {
+      profileNav.goUserProfile({
+        userId: authorId
+      })
+      return
+    }
+
+    if (!user) {
+      const fallbackUser = this.createFallbackUser(authorId)
+
+      if (!fallbackUser) {
+        this.rejectUserPage("没有找到作者资料")
+        return
+      }
+
+      wx.setNavigationBarTitle({
+        title: fallbackUser.nickname
+      })
+
+      this.setData({
+        user: fallbackUser,
+        authorPosts: [],
+        emptyText: "TA 还没有发布帖子"
+      })
       return
     }
 
@@ -53,9 +89,44 @@ Page({
     })
   },
 
-  rejectUserPage() {
+  createFallbackUser(authorId) {
+    const nickname = this.data.fallbackNickname || ""
+    const avatar = this.data.fallbackAvatar || ""
+
+    if (!nickname && !avatar) {
+      return null
+    }
+
+    return {
+      userId: authorId,
+      nickname: nickname || "校园用户",
+      avatar: avatar || "/images/avatar/default.png",
+      bio: "这位同学暂时还没有公开发布内容。",
+      role: "student",
+      roleName: "用户",
+      department: "校园论坛",
+      grade: "资料未完善",
+      tags: ["校园用户"],
+      isCurrentUser: false,
+      status: "active",
+      stats: {
+        postCount: 0,
+        viewCount: 0,
+        likeCount: 0,
+        collectCount: 0,
+        commentCount: 0
+      },
+      relation: {
+        isFollowing: false,
+        isBlocked: false
+      },
+      posts: []
+    }
+  },
+
+  rejectUserPage(message) {
     wx.showToast({
-      title: "不能进入自己的作者页",
+      title: message || "没有找到作者资料",
       icon: "none"
     })
 
@@ -75,32 +146,26 @@ Page({
 
   // 作者页内点击当前作者头像时留在当前页
   onTapAuthor(event) {
-    const authorId = event.currentTarget.dataset.authorId
-    const isCurrentUser = event.currentTarget.dataset.isCurrentUser === true ||
-      event.currentTarget.dataset.isCurrentUser === "true"
+    const dataset = event.currentTarget.dataset
 
-    if (!authorId || authorId === this.data.authorId) {
-      return
-    }
-
-    if (isCurrentUser || authorId === mockUsers.CURRENT_USER_ID) {
-      wx.showToast({
-        title: "不能进入自己的作者页",
-        icon: "none"
-      })
-      return
-    }
-
-    const url = mockUsers.getAuthorProfileUrl({
-      userId: authorId
-    })
-
-    if (!url) {
-      return
-    }
-
-    wx.navigateTo({
-      url: url
+    profileNav.goUserProfile({
+      userId: dataset.authorId,
+      nickname: dataset.authorName,
+      avatar: dataset.avatar
     })
   }
 })
+
+function decodeOption(value) {
+  const text = String(value || "")
+
+  if (!text) {
+    return ""
+  }
+
+  try {
+    return decodeURIComponent(text)
+  } catch (error) {
+    return text
+  }
+}

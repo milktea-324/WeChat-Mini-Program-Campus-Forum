@@ -1,7 +1,7 @@
 const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
-const mockUsers = require("../../utils/mock-users.js")
 const forumStore = require("../../utils/forum-store.js")
+const profileNav = require("../../utils/profile-nav.js")
 
 Page({
   data: {
@@ -240,28 +240,12 @@ Page({
 
   // 点击作者头像进入作者主页
   onTapAuthor(event) {
-    const authorId = event.currentTarget.dataset.authorId
-    const isCurrentUser = event.currentTarget.dataset.isCurrentUser === true ||
-      event.currentTarget.dataset.isCurrentUser === "true"
+    const dataset = event.currentTarget.dataset
 
-    if (isCurrentUser || authorId === mockUsers.CURRENT_USER_ID) {
-      wx.showToast({
-        title: "不能进入自己的作者页",
-        icon: "none"
-      })
-      return
-    }
-
-    const url = mockUsers.getAuthorProfileUrl({
-      userId: authorId
-    })
-
-    if (!url) {
-      return
-    }
-
-    wx.navigateTo({
-      url: url
+    profileNav.goUserProfile({
+      userId: dataset.authorId,
+      nickname: dataset.authorName,
+      avatar: dataset.avatar
     })
   }
 })

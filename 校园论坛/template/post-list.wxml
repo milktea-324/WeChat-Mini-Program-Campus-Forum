@@ -15,6 +15,7 @@
               data-author-id="{{item.authorId}}"
               data-is-current-user="{{item.authorInfo.isCurrentUser}}"
               data-author-name="{{item.author}}"
+              data-avatar="{{item.avatar}}"
             >
               <image class="forum-avatar" src="{{item.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
             </view>

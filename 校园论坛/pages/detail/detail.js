@@ -1,6 +1,7 @@
 const mockUsers = require("../../utils/mock-users.js")
 const forumStore = require("../../utils/forum-store.js")
 const commentStore = require("../../utils/comment-store.js")
+const profileNav = require("../../utils/profile-nav.js")
 
 Page({
   data: {
@@ -214,28 +215,70 @@ Page({
 
   // 点击作者头像进入作者主页
   onTapAuthor(event) {
-    const authorId = event.currentTarget.dataset.authorId
-    const isCurrentUser = event.currentTarget.dataset.isCurrentUser === true ||
-      event.currentTarget.dataset.isCurrentUser === "true"
+    const dataset = event.currentTarget.dataset
 
-    if (isCurrentUser || authorId === mockUsers.CURRENT_USER_ID) {
-      wx.showToast({
-        title: "不能进入自己的作者页",
-        icon: "none"
-      })
+    profileNav.goUserProfile({
+      userId: dataset.authorId,
+      nickname: dataset.authorName,
+      avatar: dataset.avatar
+    })
+  },
+
+  // 点击评论作者头像进入主页
+  onTapCommentAuthor(event) {
+    const commentId = event.currentTarget.dataset.commentId
+    const comment = this.findCommentById(commentId)
+
+    if (!comment) {
       return
     }
 
-    const url = mockUsers.getAuthorProfileUrl({
-      userId: authorId
-    })
+    profileNav.goUserProfile(this.getCommentProfileTarget(comment))
+  },
 
-    if (!url) {
-      return
+  findCommentById(commentId) {
+    const list = this.data.commentList || []
+
+    return list.find(item => String(item.commentId) === String(commentId)) || null
+  },
+
+  getCommentProfileTarget(comment) {
+    const author = String(comment.author || "").trim()
+    let userId = comment.authorId || ""
+
+    if (author === "当前用户" || userId === mockUsers.CURRENT_USER_ID) {
+      userId = mockUsers.CURRENT_USER_ID
+    } else if (!userId || this.isPostAuthorIdFromOtherCommentAuthor(comment)) {
+      userId = "comment-author-" + hashString(author || comment.commentId)
     }
 
-    wx.navigateTo({
-      url: url
-    })
+    return {
+      userId: userId,
+      nickname: author,
+      avatar: comment.avatar
+    }
+  },
+
+  isPostAuthorIdFromOtherCommentAuthor(comment) {
+    const post = this.data.post
+
+    if (!post || !comment || !post.authorId || !comment.authorId) {
+      return false
+    }
+
+    return String(comment.authorId) === String(post.authorId) &&
+      String(comment.author || "") !== String(post.author || "")
   }
 })
+
+function hashString(text) {
+  const value = String(text || "")
+  let hash = 0
+
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) - hash) + value.charCodeAt(i)
+    hash |= 0
+  }
+
+  return Math.abs(hash).toString(36)
+}
