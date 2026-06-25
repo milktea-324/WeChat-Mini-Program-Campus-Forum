@@ -1,5 +1,6 @@
 const mockUsers = require("../../utils/mock-users.js")
 const forumStore = require("../../utils/forum-store.js")
+const commentStore = require("../../utils/comment-store.js")
 const profileNav = require("../../utils/profile-nav.js")
 
 Page({
@@ -7,8 +8,10 @@ Page({
     authorId: "",
     fallbackNickname: "",
     fallbackAvatar: "",
+    activeTab: "posts",
     user: null,
     authorPosts: [],
+    authorComments: [],
     emptyText: "TA 还没有发布帖子"
   },
 
@@ -48,6 +51,7 @@ Page({
   loadUser(authorId) {
     const postData = forumStore.getPostData()
     const users = postData.users
+    const posts = postData.posts || []
 
     const user = mockUsers.findUserById(users, authorId)
 
@@ -70,11 +74,7 @@ Page({
         title: fallbackUser.nickname
       })
 
-      this.setData({
-        user: fallbackUser,
-        authorPosts: [],
-        emptyText: "TA 还没有发布帖子"
-      })
+      this.updateUserView(fallbackUser, [], posts)
       return
     }
 
@@ -82,11 +82,70 @@ Page({
       title: user.nickname
     })
 
-    this.setData({
-      user: user,
-      authorPosts: user.posts,
-      emptyText: "TA 还没有发布帖子"
+    this.updateUserView(user, user.posts || [], posts)
+  },
+
+  updateUserView(user, authorPosts, posts) {
+    const authorComments = this.getAuthorComments(user.userId, user.nickname, posts)
+    const safeStats = Object.assign({}, user.stats || {}, {
+      postCount: authorPosts.length,
+      commentCount: authorComments.length
     })
+    const safeUser = Object.assign({}, user, {
+      stats: safeStats
+    })
+
+    this.setData({
+      user: safeUser,
+      authorPosts: authorPosts,
+      authorComments: authorComments,
+      emptyText: this.getEmptyText(this.data.activeTab)
+    })
+  },
+
+  getAuthorComments(authorId, nickname, posts) {
+    const postMap = this.createPostMap(posts)
+    const comments = commentStore.getComments()
+
+    return comments
+      .filter(comment => this.isAuthorComment(comment, authorId, nickname))
+      .map(comment => {
+        const post = postMap[String(comment.postId)]
+        const postAvailable = Boolean(post)
+
+        return Object.assign({}, comment, {
+          postTitle: postAvailable ? post.title : "原帖已不可用",
+          postAvailable: postAvailable
+        })
+      })
+  },
+
+  createPostMap(posts) {
+    const result = {}
+    const list = Array.isArray(posts) ? posts : []
+
+    list.forEach(post => {
+      result[String(post.postId)] = post
+    })
+
+    return result
+  },
+
+  isAuthorComment(comment, authorId, nickname) {
+    const targetId = String(authorId || "")
+    const targetName = String(nickname || "").trim()
+    const commentAuthorId = String(comment && comment.authorId || "")
+    const commentAuthor = String(comment && comment.author || "").trim()
+
+    if (commentAuthorId && commentAuthorId === targetId) {
+      return !targetName || !commentAuthor || commentAuthor === targetName
+    }
+
+    return Boolean(targetName && commentAuthor && commentAuthor === targetName)
+  },
+
+  getEmptyText(tab) {
+    return tab === "comments" ? "TA 还没有发表过评论" : "TA 还没有发布帖子"
   },
 
   createFallbackUser(authorId) {
@@ -138,6 +197,37 @@ Page({
   // 点击帖子进入详情页
   onTapPost(event) {
     const postId = event.currentTarget.dataset.postId
+
+    wx.navigateTo({
+      url: "/pages/detail/detail?postId=" + postId
+    })
+  },
+
+  onChangeTab(event) {
+    const tab = event.currentTarget.dataset.tab
+
+    if (tab !== "posts" && tab !== "comments") {
+      return
+    }
+
+    this.setData({
+      activeTab: tab,
+      emptyText: this.getEmptyText(tab)
+    })
+  },
+
+  onTapComment(event) {
+    const postId = event.currentTarget.dataset.postId
+    const available = event.currentTarget.dataset.available === true ||
+      event.currentTarget.dataset.available === "true"
+
+    if (!available) {
+      wx.showToast({
+        title: "原帖已不可用",
+        icon: "none"
+      })
+      return
+    }
 
     wx.navigateTo({
       url: "/pages/detail/detail?postId=" + postId

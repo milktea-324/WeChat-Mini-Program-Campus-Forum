@@ -2,17 +2,20 @@
 
 <view class="page" wx:if="{{user}}">
   <view class="profile-card">
-    <image class="profile-avatar" src="{{user.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
+    <view class="profile-top">
+      <image class="profile-avatar" src="{{user.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
 
-    <view class="profile-main">
-      <view class="nickname">{{user.nickname}}</view>
-      <view class="bio">{{user.bio}}</view>
-
-      <view class="tag-row">
-        <view class="profile-tag">{{user.grade}}</view>
-        <view class="profile-tag">{{user.department}}</view>
-        <view class="profile-tag">{{user.roleName}}</view>
+      <view class="profile-main">
+        <view class="nickname">{{user.nickname}}</view>
+        <view class="profile-meta">{{user.grade}} · {{user.department}} · {{user.roleName}}</view>
+        <view class="bio">{{user.bio}}</view>
       </view>
+    </view>
+
+    <view class="tag-row">
+      <block wx:for="{{user.tags}}" wx:key="*this">
+        <view class="profile-tag">{{item}}</view>
+      </block>
     </view>
   </view>
 
@@ -20,6 +23,11 @@
     <view class="stat-item">
       <view class="stat-num">{{user.stats.postCount}}</view>
       <view class="stat-label">发布</view>
+    </view>
+
+    <view class="stat-item">
+      <view class="stat-num">{{user.stats.commentCount}}</view>
+      <view class="stat-label">评论</view>
     </view>
 
     <view class="stat-item">
@@ -36,29 +44,41 @@
       <view class="stat-num">{{user.stats.collectCount}}</view>
       <view class="stat-label">收藏</view>
     </view>
+  </view>
 
-    <view class="stat-item">
-      <view class="stat-num">{{user.stats.commentCount}}</view>
-      <view class="stat-label">评论</view>
+  <view class="content-tabs">
+    <view class="content-tab {{activeTab === 'posts' ? 'content-tab-active' : ''}}" data-tab="posts" bindtap="onChangeTab">
+      TA 的发布
+    </view>
+    <view class="content-tab {{activeTab === 'comments' ? 'content-tab-active' : ''}}" data-tab="comments" bindtap="onChangeTab">
+      TA 的评论
     </view>
   </view>
 
-  <view class="meta-card">
-    <view class="meta-title">资料标签</view>
-
-    <view class="interest-list">
-      <block wx:for="{{user.tags}}" wx:key="*this">
-        <view class="interest-item">{{item}}</view>
-      </block>
-    </view>
-  </view>
-
-  <view class="section-title">
-    <text>TA的发布</text>
-  </view>
-
-  <view class="post-list">
+  <view wx:if="{{activeTab === 'posts'}}" class="post-list">
     <template is="postList" data="{{list: authorPosts, emptyText: emptyText}}" />
+  </view>
+
+  <view wx:elif="{{activeTab === 'comments'}}" class="comment-list">
+    <block wx:if="{{authorComments && authorComments.length > 0}}">
+      <block wx:for="{{authorComments}}" wx:key="commentId">
+        <view
+          class="comment-card"
+          bindtap="onTapComment"
+          data-post-id="{{item.postId}}"
+          data-available="{{item.postAvailable}}"
+        >
+          <view class="comment-content">{{item.content}}</view>
+          <view class="comment-post">评论了帖子《{{item.postTitle}}》</view>
+          <view class="comment-date">{{item.date}}</view>
+        </view>
+      </block>
+    </block>
+
+    <view wx:else class="comment-empty">
+      <image class="comment-empty-icon" src="/images/icon/empty.png" mode="aspectFit"></image>
+      <view>{{emptyText}}</view>
+    </view>
   </view>
 </view>
 
