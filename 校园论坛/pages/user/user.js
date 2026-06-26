@@ -3,6 +3,7 @@ const forumStore = require("../../utils/forum-store.js")
 const commentStore = require("../../utils/comment-store.js")
 const profileNav = require("../../utils/profile-nav.js")
 const routeNav = require("../../utils/route-nav.js")
+const userStore = require("../../utils/user-store.js")
 
 Page({
   data: {
@@ -50,21 +51,27 @@ Page({
 
   // 加载作者资料和该作者发布的帖子
   loadUser(authorId) {
+    const targetAuthorId = String(authorId || "")
+    const storedUser = userStore.findUserById(targetAuthorId)
     const postData = forumStore.getPostData()
     const users = postData.users
     const posts = postData.posts || []
 
-    const user = mockUsers.findUserById(users, authorId)
+    const mockUser = mockUsers.findUserById(users, targetAuthorId)
+    const user = mergeUserProfile(mockUser, storedUser, targetAuthorId, {
+      nickname: this.data.fallbackNickname,
+      avatar: this.data.fallbackAvatar
+    })
 
     if (user && user.isCurrentUser) {
       profileNav.goUserProfile({
-        userId: authorId
+        userId: targetAuthorId
       })
       return
     }
 
     if (!user) {
-      const fallbackUser = this.createFallbackUser(authorId)
+      const fallbackUser = this.createFallbackUser(targetAuthorId)
 
       if (!fallbackUser) {
         this.rejectUserPage("没有找到作者资料")
@@ -75,7 +82,7 @@ Page({
         title: fallbackUser.nickname
       })
 
-      this.updateUserView(fallbackUser, [], posts)
+      this.updateUserView(fallbackUser, [], posts, targetAuthorId, fallbackUser.nickname)
       return
     }
 
@@ -83,11 +90,17 @@ Page({
       title: user.nickname
     })
 
-    this.updateUserView(user, user.posts || [], posts)
+    this.updateUserView(
+      user,
+      mockUser && mockUser.posts || user.posts || [],
+      posts,
+      targetAuthorId,
+      mockUser && mockUser.nickname || user.nickname
+    )
   },
 
-  updateUserView(user, authorPosts, posts) {
-    const authorComments = this.getAuthorComments(user.userId, user.nickname, posts)
+  updateUserView(user, authorPosts, posts, targetAuthorId, targetNickname) {
+    const authorComments = this.getAuthorComments(targetAuthorId, targetNickname, posts)
     const safeStats = Object.assign({}, user.stats || {}, {
       postCount: authorPosts.length,
       commentCount: authorComments.length
@@ -139,7 +152,7 @@ Page({
     const commentAuthor = String(comment && comment.author || "").trim()
 
     if (commentAuthorId && commentAuthorId === targetId) {
-      return !targetName || !commentAuthor || commentAuthor === targetName
+      return true
     }
 
     return Boolean(targetName && commentAuthor && commentAuthor === targetName)
@@ -255,4 +268,77 @@ function decodeOption(value) {
   } catch (error) {
     return text
   }
+}
+
+function createEmptyStats() {
+  return {
+    postCount: 0,
+    viewCount: 0,
+    likeCount: 0,
+    collectCount: 0,
+    commentCount: 0
+  }
+}
+
+function createDefaultUser(authorId) {
+  return {
+    userId: authorId,
+    nickname: "校园用户",
+    avatar: "/images/avatar/default.png",
+    bio: "这位同学暂时还没有公开发布内容。",
+    role: "student",
+    roleName: "用户",
+    department: "校园论坛",
+    grade: "资料未完善",
+    tags: ["校园用户"],
+    isCurrentUser: false,
+    status: "active",
+    stats: createEmptyStats(),
+    relation: {
+      isFollowing: false,
+      isBlocked: false
+    },
+    posts: []
+  }
+}
+
+function mergeUserProfile(mockUser, storedUser, authorId) {
+  if (!mockUser && !storedUser) {
+    return null
+  }
+
+  const baseUser = Object.assign(
+    createDefaultUser(authorId),
+    mockUser || {}
+  )
+  const safeStoredUser = storedUser || {}
+  const hasMockUser = Boolean(mockUser)
+  const tags = hasMockUser && Array.isArray(baseUser.tags) && baseUser.tags.length > 0
+    ? baseUser.tags
+    : Array.isArray(safeStoredUser.tags) && safeStoredUser.tags.length > 0
+      ? safeStoredUser.tags
+      : Array.isArray(baseUser.tags) ? baseUser.tags : []
+
+  return Object.assign({}, baseUser, hasMockUser ? {} : safeStoredUser, {
+    userId: authorId,
+    nickname: safeStoredUser.nickname || baseUser.nickname || "校园用户",
+    avatar: safeStoredUser.avatar || baseUser.avatar || "/images/avatar/default.png",
+    roleName: safeStoredUser.roleName || baseUser.roleName || "用户",
+    department: safeStoredUser.department || baseUser.department || "校园论坛",
+    grade: safeStoredUser.grade || baseUser.grade || "资料未完善",
+    tags: tags,
+    isCurrentUser: Boolean(safeStoredUser.isCurrentUser || baseUser.isCurrentUser),
+    status: safeStoredUser.status || baseUser.status || "active",
+    nickname: hasMockUser ? baseUser.nickname : safeStoredUser.nickname || baseUser.nickname,
+    avatar: hasMockUser ? baseUser.avatar : safeStoredUser.avatar || baseUser.avatar,
+    roleName: hasMockUser ? baseUser.roleName || safeStoredUser.roleName : safeStoredUser.roleName || baseUser.roleName,
+    department: hasMockUser ? baseUser.department || safeStoredUser.department : safeStoredUser.department || baseUser.department,
+    grade: hasMockUser ? baseUser.grade || safeStoredUser.grade : safeStoredUser.grade || baseUser.grade,
+    stats: baseUser.stats || createEmptyStats(),
+    relation: baseUser.relation || {
+      isFollowing: false,
+      isBlocked: false
+    },
+    posts: baseUser.posts || []
+  })
 }

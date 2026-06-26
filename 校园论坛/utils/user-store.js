@@ -2,6 +2,7 @@ const USER_STORAGE_KEY = "forum_users"
 const CURRENT_USER_STORAGE_KEY = "forum_current_user"
 const CURRENT_USER_ID = "current-user"
 const DEFAULT_AVATAR = "/images/avatar/default.png"
+const seedUsers = require("../data/user-data.js")
 
 const departments = [
   "计算机学院",
@@ -271,16 +272,22 @@ function getCommentAuthorName(comment) {
 }
 
 function getCommentUserId(comment) {
-  const authorId = String(comment && comment.authorId || "").trim()
-
-  if (authorId) {
-    return authorId
-  }
-
   const author = getCommentAuthorName(comment)
 
   if (author === "\u5f53\u524d\u7528\u6237") {
     return CURRENT_USER_ID
+  }
+
+  const seedUser = seedUsers.findSeedUserByNickname(author)
+
+  if (seedUser) {
+    return seedUser.userId
+  }
+
+  const authorId = String(comment && comment.authorId || "").trim()
+
+  if (authorId) {
+    return authorId
   }
 
   return "comment-author-" + hashString(author)
@@ -289,6 +296,12 @@ function getCommentUserId(comment) {
 function createUserFromComment(comment) {
   const userId = getCommentUserId(comment)
   const nickname = userId === CURRENT_USER_ID ? "\u5f53\u524d\u7528\u6237" : getCommentAuthorName(comment)
+  const seedUser = seedUsers.findSeedUserByNickname(nickname)
+
+  if (seedUser && userId === seedUser.userId) {
+    return normalizeUser(seedUser)
+  }
+
   const seed = Number.parseInt(hashString(userId), 36) || 1
   const department = pick(departments, seed)
   const grade = pick(grades, seed + 1)

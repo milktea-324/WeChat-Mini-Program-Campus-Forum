@@ -1,6 +1,7 @@
 const forumStore = require("./forum-store.js")
 const mockUsers = require("./mock-users.js")
 const userStore = require("./user-store.js")
+const seedUsers = require("../data/user-data.js")
 
 const COMMENTS_STORAGE_KEY = "forum_comments"
 const DEFAULT_AVATAR = "/images/avatar/default.png"
@@ -17,14 +18,35 @@ function hashString(text) {
   return Math.abs(hash).toString(36)
 }
 
+function isCurrentUserAuthor(name) {
+  return String(name || "").trim() === "当前用户"
+}
+
+function isSamePostAuthor(name, post) {
+  const author = String(name || "").trim()
+  const postAuthor = String(post && post.author || "").trim()
+
+  return Boolean(author && postAuthor && author === postAuthor)
+}
+
+function getSeedUserByAuthor(author) {
+  return seedUsers.findSeedUserByNickname(author)
+}
+
 function getStableAuthorId(author, post) {
   const name = String(author || "").trim()
 
-  if (name === "当前用户") {
+  if (isCurrentUserAuthor(name)) {
     return mockUsers.CURRENT_USER_ID
   }
 
-  if (post && post.authorId) {
+  const seedUser = getSeedUserByAuthor(name)
+
+  if (seedUser) {
+    return seedUser.userId
+  }
+
+  if (isSamePostAuthor(name, post) && post && post.authorId) {
     return post.authorId
   }
 
@@ -63,6 +85,7 @@ function normalizeNumber(value, defaultValue) {
 function normalizeComment(comment, post) {
   const source = comment || {}
   const author = source.author || (post && post.author) || "匿名用户"
+  const seedUser = getSeedUserByAuthor(author)
   const date = source.date || source.createdAt || (post && post.date) || ""
 
   return {
@@ -72,9 +95,9 @@ function normalizeComment(comment, post) {
     postId: source.postId !== undefined && source.postId !== null
       ? source.postId
       : post && post.postId,
-    authorId: source.authorId || getStableAuthorId(author, post),
-    author: author,
-    avatar: source.avatar || (post && post.avatar) || DEFAULT_AVATAR,
+    authorId: seedUser ? seedUser.userId : source.authorId || getStableAuthorId(author, post),
+    author: seedUser ? seedUser.nickname : author,
+    avatar: seedUser ? seedUser.avatar : source.avatar || (post && post.avatar) || DEFAULT_AVATAR,
     content: source.content || "",
     createdAt: source.createdAt || date,
     date: date,

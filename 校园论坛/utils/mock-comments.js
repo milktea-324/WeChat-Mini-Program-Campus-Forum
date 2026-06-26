@@ -1,5 +1,7 @@
 // utils/mock-comments.js
 
+const seedUsers = require("../data/user-data.js")
+
 const mockAuthors = [
   "阿明", "小周", "木子", "南风", "七月",
   "白露", "清欢", "川柏", "知夏", "洛川",
@@ -10,14 +12,21 @@ const mockAuthors = [
 // 生成单条模拟评论
 function createMockComment(postId, index, date) {
   const authorIndex = (postId + index) % mockAuthors.length
-
-  return {
+  const author = mockAuthors[authorIndex]
+  const seedUser = seedUsers.findSeedUserByNickname(author)
+  const comment = {
     commentId: Number(String(postId) + String(index + 1).padStart(3, "0")),
-    author: mockAuthors[authorIndex],
-    avatar: "/images/avatar/" + ((authorIndex % 20) + 1) + ".png",
+    author: seedUser ? seedUser.nickname : author,
+    avatar: seedUser ? seedUser.avatar : "/images/avatar/" + ((authorIndex % 20) + 1) + ".png",
     content: "模拟评论内容-" + postId + "-" + (index + 1),
     date: date || "2026-06-20"
   }
+
+  if (seedUser) {
+    comment.authorId = seedUser.userId
+  }
+
+  return comment
 }
 
 // 给帖子补全评论

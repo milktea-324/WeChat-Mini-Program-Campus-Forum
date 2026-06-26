@@ -92,9 +92,9 @@ assert.strictEqual(context.storage.forum_posts[0].comments.length, 2)
 const firstComment = comments.find(comment => comment.commentId === 101)
 assert.ok(firstComment)
 assert.strictEqual(firstComment.postId, 1)
-assert.ok(firstComment.authorId)
+assert.strictEqual(firstComment.authorId, "user-q46n")
 assert.strictEqual(firstComment.author, "阿明")
-assert.strictEqual(firstComment.avatar, "/images/avatar/2.png")
+assert.strictEqual(firstComment.avatar, "/images/avatar/3.png")
 assert.strictEqual(firstComment.content, "第一条评论")
 assert.strictEqual(firstComment.createdAt, "2026-06-02")
 assert.strictEqual(firstComment.date, "2026-06-02")
@@ -142,6 +142,21 @@ assert.strictEqual(normalized.avatar, "/images/avatar/9.png")
 assert.strictEqual(normalized.createdAt, "2026-06-09")
 assert.strictEqual(normalized.date, "2026-06-09")
 assert.strictEqual(normalized.status, "active")
+
+const otherAuthorOnPost = context.store.normalizeComment({
+  author: "\u8def\u4eba\u7532",
+  content: "\u4e0d\u5e94\u8be5\u7ee7\u627f\u539f\u5e16\u4f5c\u8005 ID"
+}, {
+  postId: 9,
+  author: "\u53d1\u5e16\u4eba",
+  authorId: "post-author-id",
+  avatar: "/images/avatar/9.png",
+  date: "2026-06-09"
+})
+
+assert.notStrictEqual(otherAuthorOnPost.authorId, "post-author-id")
+assert.ok(otherAuthorOnPost.authorId.startsWith("comment-author-"))
+assert.strictEqual(otherAuthorOnPost.author, "\u8def\u4eba\u7532")
 
 context = resetStore({
   forum_comments: [
@@ -230,6 +245,40 @@ context = resetStore({
 comments = context.store.getComments()
 const noAvatarUser = context.storage.forum_users.find(user => user.userId === comments[0].authorId)
 assert.strictEqual(noAvatarUser.avatar, "/images/avatar/default.png")
+
+context = resetStore({
+  forum_comments: [
+    {
+      commentId: "seed-shadow-user",
+      postId: 1,
+      authorId: "comment-author-f0if",
+      author: "\u5357\u98ce",
+      avatar: "/images/avatar/wrong.png",
+      content: "\u65e7\u7f13\u5b58\u4e2d\u7684\u79cd\u5b50\u4f5c\u8005\u8bc4\u8bba"
+    }
+  ],
+  forum_posts: [
+    {
+      postId: 1,
+      author: "\u5c0f\u6797",
+      authorId: "user-g86g",
+      avatar: "/images/avatar/1.png",
+      comments: []
+    }
+  ]
+})
+
+comments = context.store.getComments()
+const seedComment = comments[0]
+assert.strictEqual(seedComment.authorId, "user-f0if")
+assert.strictEqual(seedComment.author, "\u5357\u98ce")
+assert.strictEqual(seedComment.avatar, "/images/avatar/5.png")
+assert.ok(context.storage.forum_users.some(user => (
+  user.userId === "user-f0if" &&
+  user.nickname === "\u5357\u98ce" &&
+  user.avatar === "/images/avatar/5.png"
+)))
+assert.ok(!context.storage.forum_users.some(user => user.userId === "comment-author-f0if"))
 
 context = resetStore({
   forum_comments: [

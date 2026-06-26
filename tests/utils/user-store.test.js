@@ -198,6 +198,16 @@ assert.strictEqual(commentAuthorA.userId, commentAuthorB.userId)
 assert.strictEqual(commentAuthorA.nickname, "\u8bc4\u8bba\u540c\u5b66")
 assert.strictEqual(commentAuthorA.avatar, "/images/avatar/7.png")
 
+const seedCommentAuthor = store.createUserFromComment({
+  authorId: "comment-author-f0if",
+  author: "\u5357\u98ce",
+  avatar: "/images/avatar/wrong.png"
+})
+
+assert.strictEqual(seedCommentAuthor.userId, "user-f0if")
+assert.strictEqual(seedCommentAuthor.nickname, "\u5357\u98ce")
+assert.strictEqual(seedCommentAuthor.avatar, "/images/avatar/5.png")
+
 const explicitCommentAuthor = store.createUserFromComment({
   authorId: "comment-explicit-user",
   author: "\u5df2\u6709 ID \u8bc4\u8bba\u8005"
@@ -242,6 +252,24 @@ assert.ok(usersFromComments.some(user => user.userId === "current-user"))
 assert.ok(usersFromComments.some(user => user.userId === "comment-user-a"))
 assert.ok(usersFromComments.some(user => user.nickname === "\u8bc4\u8bba\u4f5c\u8005 B"))
 assert.deepStrictEqual(context.storage.forum_current_user, { userId: "current-user" })
+
+context = resetStore()
+store = context.store
+
+const usersFromSeedComments = store.ensureUsersFromComments([
+  {
+    authorId: "comment-author-f0if",
+    author: "\u5357\u98ce",
+    avatar: "/images/avatar/wrong.png"
+  }
+])
+
+assert.ok(usersFromSeedComments.some(user => (
+  user.userId === "user-f0if" &&
+  user.nickname === "\u5357\u98ce" &&
+  user.avatar === "/images/avatar/5.png"
+)))
+assert.ok(!usersFromSeedComments.some(user => user.userId === "comment-author-f0if"))
 
 store.resetUsersForTest()
 assert.strictEqual(context.storage.forum_users, undefined)
