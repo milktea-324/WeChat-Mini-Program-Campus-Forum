@@ -1,5 +1,6 @@
 const forumStore = require("./forum-store.js")
 const mockUsers = require("./mock-users.js")
+const userStore = require("./user-store.js")
 
 const COMMENTS_STORAGE_KEY = "forum_comments"
 const DEFAULT_AVATAR = "/images/avatar/default.png"
@@ -130,6 +131,7 @@ function saveComments(comments) {
   })
 
   wx.setStorageSync(COMMENTS_STORAGE_KEY, result)
+  userStore.ensureUsersFromComments(result)
 
   return result
 }
@@ -143,9 +145,7 @@ function getComments() {
 
   const migratedComments = migrateCommentsFromPosts(forumStore.getPosts())
 
-  wx.setStorageSync(COMMENTS_STORAGE_KEY, migratedComments)
-
-  return migratedComments
+  return saveComments(migratedComments)
 }
 
 function isSamePostId(left, right) {

@@ -264,6 +264,53 @@ function createUserFromPost(post) {
   })
 }
 
+function getCommentAuthorName(comment) {
+  const author = String(comment && comment.author || "").trim()
+
+  return author || "\u6821\u56ed\u7528\u6237"
+}
+
+function getCommentUserId(comment) {
+  const authorId = String(comment && comment.authorId || "").trim()
+
+  if (authorId) {
+    return authorId
+  }
+
+  const author = getCommentAuthorName(comment)
+
+  if (author === "\u5f53\u524d\u7528\u6237") {
+    return CURRENT_USER_ID
+  }
+
+  return "comment-author-" + hashString(author)
+}
+
+function createUserFromComment(comment) {
+  const userId = getCommentUserId(comment)
+  const nickname = userId === CURRENT_USER_ID ? "\u5f53\u524d\u7528\u6237" : getCommentAuthorName(comment)
+  const seed = Number.parseInt(hashString(userId), 36) || 1
+  const department = pick(departments, seed)
+  const grade = pick(grades, seed + 1)
+  const tags = pick(tagGroups, seed + 2)
+  const day = String((seed % 26) + 1).padStart(2, "0")
+
+  return normalizeUser({
+    userId: userId,
+    nickname: nickname,
+    avatar: comment && comment.avatar || DEFAULT_AVATAR,
+    bio: grade + department + "\u540c\u5b66\uff0c\u5173\u6ce8" + tags.join("\u3001") + "\u7b49\u6821\u56ed\u8bdd\u9898\u3002",
+    role: "student",
+    roleName: "\u5b66\u751f",
+    department: department,
+    grade: grade,
+    tags: tags,
+    status: "active",
+    createdAt: "2025-09-" + day,
+    updatedAt: "2025-09-" + day
+  })
+}
+
 function ensureCurrentUser() {
   const users = getUsers()
   const currentUser = users.find(user => user.userId === CURRENT_USER_ID) || createDefaultCurrentUser()
@@ -301,6 +348,20 @@ function ensureUsersFromPosts(posts) {
   return result
 }
 
+function ensureUsersFromComments(comments) {
+  const sourceComments = Array.isArray(comments) ? comments : []
+  const users = getUsers()
+  const generatedUsers = sourceComments
+    .map(createUserFromComment)
+    .filter(user => Boolean(user))
+
+  const result = saveUsers(users.concat(generatedUsers, createDefaultCurrentUser()))
+
+  setCurrentUserRef(getCurrentUserRef().userId || CURRENT_USER_ID)
+
+  return result
+}
+
 function resetUsersForTest() {
   removeStorage(USER_STORAGE_KEY)
   removeStorage(CURRENT_USER_STORAGE_KEY)
@@ -318,5 +379,7 @@ module.exports = {
   createDefaultCurrentUser,
   createUserFromPost,
   ensureUsersFromPosts,
+  createUserFromComment,
+  ensureUsersFromComments,
   resetUsersForTest
 }

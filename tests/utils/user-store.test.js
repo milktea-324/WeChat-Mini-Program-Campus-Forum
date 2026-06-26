@@ -177,6 +177,72 @@ const noAvatarUser = store.createUserFromPost({
 
 assert.strictEqual(noAvatarUser.avatar, "/images/avatar/default.png")
 
+const currentUserFromComment = store.createUserFromComment({
+  author: "\u5f53\u524d\u7528\u6237",
+  avatar: "/images/avatar/2.png"
+})
+
+assert.strictEqual(currentUserFromComment.userId, "current-user")
+assert.strictEqual(currentUserFromComment.nickname, "\u5f53\u524d\u7528\u6237")
+
+const commentAuthorA = store.createUserFromComment({
+  author: "\u8bc4\u8bba\u540c\u5b66",
+  avatar: "/images/avatar/7.png"
+})
+const commentAuthorB = store.createUserFromComment({
+  author: "\u8bc4\u8bba\u540c\u5b66"
+})
+
+assert.ok(commentAuthorA.userId.startsWith("comment-author-"))
+assert.strictEqual(commentAuthorA.userId, commentAuthorB.userId)
+assert.strictEqual(commentAuthorA.nickname, "\u8bc4\u8bba\u540c\u5b66")
+assert.strictEqual(commentAuthorA.avatar, "/images/avatar/7.png")
+
+const explicitCommentAuthor = store.createUserFromComment({
+  authorId: "comment-explicit-user",
+  author: "\u5df2\u6709 ID \u8bc4\u8bba\u8005"
+})
+
+assert.strictEqual(explicitCommentAuthor.userId, "comment-explicit-user")
+assert.strictEqual(explicitCommentAuthor.nickname, "\u5df2\u6709 ID \u8bc4\u8bba\u8005")
+assert.strictEqual(explicitCommentAuthor.avatar, "/images/avatar/default.png")
+
+const fallbackCommentAuthor = store.createUserFromComment({
+  content: "\u7f3a\u5c11\u4f5c\u8005\u7684\u8bc4\u8bba"
+})
+
+assert.ok(fallbackCommentAuthor.userId.startsWith("comment-author-"))
+assert.strictEqual(fallbackCommentAuthor.nickname, "\u6821\u56ed\u7528\u6237")
+assert.strictEqual(fallbackCommentAuthor.avatar, "/images/avatar/default.png")
+
+context = resetStore({
+  forum_users: [
+    {
+      userId: "kept-comment-user",
+      nickname: "\u4fdd\u7559\u8bc4\u8bba\u7528\u6237",
+      avatar: "/images/avatar/10.png"
+    }
+  ]
+})
+store = context.store
+
+const usersFromComments = store.ensureUsersFromComments([
+  {
+    authorId: "comment-user-a",
+    author: "\u8bc4\u8bba\u4f5c\u8005 A",
+    avatar: "/images/avatar/11.png"
+  },
+  {
+    author: "\u8bc4\u8bba\u4f5c\u8005 B"
+  }
+])
+
+assert.ok(usersFromComments.some(user => user.userId === "kept-comment-user"))
+assert.ok(usersFromComments.some(user => user.userId === "current-user"))
+assert.ok(usersFromComments.some(user => user.userId === "comment-user-a"))
+assert.ok(usersFromComments.some(user => user.nickname === "\u8bc4\u8bba\u4f5c\u8005 B"))
+assert.deepStrictEqual(context.storage.forum_current_user, { userId: "current-user" })
+
 store.resetUsersForTest()
 assert.strictEqual(context.storage.forum_users, undefined)
 assert.strictEqual(context.storage.forum_current_user, undefined)

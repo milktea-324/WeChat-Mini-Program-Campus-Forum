@@ -3,6 +3,7 @@ const path = require("path")
 
 const commentStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "comment-store.js")
 const forumStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "forum-store.js")
+const userStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "user-store.js")
 
 function resetStore(storage) {
   try {
@@ -11,6 +12,10 @@ function resetStore(storage) {
 
   try {
     delete require.cache[require.resolve(forumStorePath)]
+  } catch (error) {}
+
+  try {
+    delete require.cache[require.resolve(userStorePath)]
   } catch (error) {}
 
   const data = storage || {}
@@ -105,6 +110,11 @@ assert.strictEqual(firstComment.status, "active")
 const currentUserComment = comments.find(comment => comment.commentId === 201)
 assert.strictEqual(currentUserComment.authorId, "current-user")
 
+assert.ok(Array.isArray(context.storage.forum_users))
+assert.ok(context.storage.forum_users.some(user => user.userId === "current-user"))
+assert.ok(context.storage.forum_users.some(user => user.userId === "user-comment"))
+assert.ok(context.storage.forum_users.some(user => user.userId === "user-post-author"))
+
 const secondCall = context.store.getComments()
 assert.strictEqual(secondCall.length, 3)
 assert.strictEqual(context.storage.forum_comments.length, 3)
@@ -161,6 +171,7 @@ comments = context.store.getComments()
 assert.strictEqual(comments.length, 1)
 assert.strictEqual(comments[0].commentId, "existing")
 assert.strictEqual(context.store.getCommentsByPostId(88).length, 1)
+assert.ok(context.storage.forum_users.some(user => user.nickname === "\u5df2\u6709\u8bc4\u8bba"))
 
 context = resetStore({
   forum_comments: "bad-cache",
@@ -176,6 +187,49 @@ assert.deepStrictEqual(context.store.getComments(), [])
 assert.deepStrictEqual(context.storage.forum_comments, [])
 assert.deepStrictEqual(context.store.getCommentsByPostId(3), [])
 assert.strictEqual(context.store.getCommentCountByPostId(3), 0)
+assert.ok(context.storage.forum_users.some(user => user.userId === "current-user"))
+
+context = resetStore({
+  forum_comments: [
+    {
+      commentId: "legacy-a",
+      postId: 6,
+      author: "\u65e7\u8bc4\u8bba\u4f5c\u8005",
+      content: "\u7f3a\u5c11 authorId \u548c\u5934\u50cf"
+    },
+    {
+      commentId: "legacy-b",
+      postId: 6,
+      author: "\u65e7\u8bc4\u8bba\u4f5c\u8005",
+      avatar: "/images/avatar/8.png",
+      content: "\u540c\u4e00\u4f5c\u8005\u7a33\u5b9a ID"
+    }
+  ],
+  forum_posts: []
+})
+
+comments = context.store.getComments()
+const legacyUsers = context.storage.forum_users.filter(user => user.nickname === "\u65e7\u8bc4\u8bba\u4f5c\u8005")
+assert.strictEqual(legacyUsers.length, 1)
+assert.ok(legacyUsers[0].userId.startsWith("comment-author-"))
+assert.strictEqual(legacyUsers[0].avatar, "/images/avatar/8.png")
+assert.strictEqual(comments[0].authorId, comments[1].authorId)
+
+context = resetStore({
+  forum_comments: [
+    {
+      commentId: "no-avatar",
+      postId: 6,
+      author: "\u7f3a\u5934\u50cf\u8bc4\u8bba\u4f5c\u8005",
+      content: "\u7f3a\u5934\u50cf"
+    }
+  ],
+  forum_posts: []
+})
+
+comments = context.store.getComments()
+const noAvatarUser = context.storage.forum_users.find(user => user.userId === comments[0].authorId)
+assert.strictEqual(noAvatarUser.avatar, "/images/avatar/default.png")
 
 context = resetStore({
   forum_comments: [
@@ -220,6 +274,21 @@ assert.strictEqual(addedComment.commentId, createdComment.commentId)
 assert.strictEqual(context.storage.forum_comments.length, 2)
 assert.strictEqual(context.store.getCommentsByPostId(7).length, 2)
 assert.strictEqual(context.store.getCommentCountByPostId(7), 2)
+assert.ok(context.storage.forum_users.some(user => user.userId === "current-user"))
+
+const addedOtherComment = context.store.addComment({
+  commentId: "new-user-comment",
+  postId: 7,
+  authorId: "new-comment-user",
+  author: "\u65b0\u589e\u8bc4\u8bba\u540c\u5b66",
+  avatar: "/images/avatar/6.png",
+  content: "\u65b0\u7528\u6237\u8bc4\u8bba"
+})
+assert.strictEqual(addedOtherComment.authorId, "new-comment-user")
+assert.ok(context.storage.forum_users.some(user => (
+  user.userId === "new-comment-user" &&
+  user.nickname === "\u65b0\u589e\u8bc4\u8bba\u540c\u5b66"
+)))
 
 context = resetStore()
 assert.ok(Array.isArray(context.store.getComments()))
