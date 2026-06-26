@@ -1,5 +1,29 @@
 const forumData = require("../../data/forum-data.js")
 const forumStore = require("../../utils/forum-store.js")
+const userStore = require("../../utils/user-store.js")
+
+const DEFAULT_CURRENT_USER = {
+  userId: "current-user",
+  nickname: "\u5f53\u524d\u7528\u6237",
+  avatar: "/images/avatar/default.png"
+}
+
+function getSafeCurrentUser() {
+  try {
+    const currentUser = userStore.getCurrentUser()
+    const userId = String(currentUser && currentUser.userId || "").trim()
+    const nickname = String(currentUser && currentUser.nickname || "").trim()
+    const avatar = String(currentUser && currentUser.avatar || "").trim()
+
+    return {
+      userId: userId || DEFAULT_CURRENT_USER.userId,
+      nickname: nickname || DEFAULT_CURRENT_USER.nickname,
+      avatar: avatar || DEFAULT_CURRENT_USER.avatar
+    }
+  } catch (error) {
+    return DEFAULT_CURRENT_USER
+  }
+}
 
 Page({
   data: {
@@ -129,13 +153,16 @@ Page({
       finalContent = content + "\n\n联系方式：" + contact
     }
 
+    const currentUser = getSafeCurrentUser()
+
     const newPost = {
       postId: newPostId,
       title: title,
       content: finalContent,
       category: category,
-      author: "当前用户",
-      avatar: "/images/avatar/default.png",
+      authorId: currentUser.userId,
+      author: currentUser.nickname,
+      avatar: currentUser.avatar,
       postImg: postImg,
       collect: 0,
       date: this.getToday(),

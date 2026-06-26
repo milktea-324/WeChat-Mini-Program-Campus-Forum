@@ -2,6 +2,30 @@ const mockUsers = require("../../utils/mock-users.js")
 const forumStore = require("../../utils/forum-store.js")
 const commentStore = require("../../utils/comment-store.js")
 const profileNav = require("../../utils/profile-nav.js")
+const userStore = require("../../utils/user-store.js")
+
+const DEFAULT_CURRENT_USER = {
+  userId: "current-user",
+  nickname: "\u5f53\u524d\u7528\u6237",
+  avatar: "/images/avatar/default.png"
+}
+
+function getSafeCurrentUser() {
+  try {
+    const currentUser = userStore.getCurrentUser()
+    const userId = String(currentUser && currentUser.userId || "").trim()
+    const nickname = String(currentUser && currentUser.nickname || "").trim()
+    const avatar = String(currentUser && currentUser.avatar || "").trim()
+
+    return {
+      userId: userId || DEFAULT_CURRENT_USER.userId,
+      nickname: nickname || DEFAULT_CURRENT_USER.nickname,
+      avatar: avatar || DEFAULT_CURRENT_USER.avatar
+    }
+  } catch (error) {
+    return DEFAULT_CURRENT_USER
+  }
+}
 
 Page({
   data: {
@@ -173,10 +197,12 @@ Page({
       return
     }
 
+    const currentUser = getSafeCurrentUser()
+
     const newComment = commentStore.createComment(this.data.postId, text, {
-      authorId: mockUsers.CURRENT_USER_ID,
-      author: "当前用户",
-      avatar: "/images/avatar/default.png",
+      authorId: currentUser.userId,
+      author: currentUser.nickname,
+      avatar: currentUser.avatar,
       date: this.getToday()
     })
 
