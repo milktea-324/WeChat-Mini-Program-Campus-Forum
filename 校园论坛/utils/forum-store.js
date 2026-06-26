@@ -1,6 +1,7 @@
 const forumData = require("../data/forum-data.js")
 const mockComments = require("./mock-comments.js")
 const mockUsers = require("./mock-users.js")
+const userStore = require("./user-store.js")
 
 const POSTS_STORAGE_KEY = "forum_posts"
 const MY_POSTS_STORAGE_KEY = "forum_my_posts"
@@ -46,7 +47,11 @@ function normalizePostData(posts) {
   const safePosts = sourcePosts.map(normalizePostFields)
   const postsWithComments = mockComments.fillMockComments(safePosts).map(normalizePostFields)
 
-  return mockUsers.fillMockUsers(postsWithComments)
+  const result = mockUsers.fillMockUsers(postsWithComments)
+
+  userStore.ensureUsersFromPosts(result.posts)
+
+  return result
 }
 
 function normalizePost(post) {

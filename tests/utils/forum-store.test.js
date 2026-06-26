@@ -2,9 +2,11 @@ const assert = require("assert")
 const path = require("path")
 
 const storePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "forum-store.js")
+const userStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "user-store.js")
 
 function resetStore(storage) {
   delete require.cache[require.resolve(storePath)]
+  delete require.cache[require.resolve(userStorePath)]
 
   const data = storage || {}
 
@@ -34,6 +36,13 @@ assert.ok(posts[0].authorId)
 assert.ok(posts[0].authorInfo)
 assert.strictEqual(typeof posts[0].isLiked, "boolean")
 assert.strictEqual(typeof posts[0].isCollected, "boolean")
+assert.strictEqual(typeof posts[0].isMine, "boolean")
+assert.strictEqual(typeof posts[0].author, "string")
+assert.strictEqual(typeof posts[0].avatar, "string")
+assert.ok(Array.isArray(context.storage.forum_users))
+assert.ok(context.storage.forum_users.some(user => user.userId === "current-user"))
+assert.ok(context.storage.forum_users.some(user => user.nickname === "小林"))
+assert.deepStrictEqual(context.storage.forum_current_user, { userId: "current-user" })
 
 const postData = context.store.getPostData()
 assert.strictEqual(postData.posts, context.storage.forum_posts)
