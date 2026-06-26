@@ -5,6 +5,29 @@ const commentStore = require("../../utils/comment-store.js")
 const mockUsers = require("../../utils/mock-users.js")
 const profileNav = require("../../utils/profile-nav.js")
 const routeNav = require("../../utils/route-nav.js")
+const userStore = require("../../utils/user-store.js")
+
+const DEFAULT_USER_PROFILE = {
+  nickname: "校园用户",
+  avatar: "/images/avatar/default.png"
+}
+
+function getSafeCurrentUserProfile(defaultUser) {
+  const fallback = Object.assign({}, DEFAULT_USER_PROFILE, defaultUser || {})
+
+  try {
+    const currentUser = userStore.getCurrentUser()
+    const nickname = String(currentUser && currentUser.nickname || "").trim()
+    const avatar = String(currentUser && currentUser.avatar || "").trim()
+
+    return Object.assign({}, fallback, {
+      nickname: nickname || fallback.nickname,
+      avatar: avatar || fallback.avatar
+    })
+  } catch (error) {
+    return fallback
+  }
+}
 
 Page({
   data: {
@@ -104,6 +127,7 @@ Page({
 
   // 加载个人页数据
   loadData() {
+    const user = getSafeCurrentUserProfile(this.data.user)
     const posts = forumStore.getPosts()
     const myPostIds = forumStore.getMyPostIds()
 
@@ -128,6 +152,7 @@ Page({
     })
 
     this.setData({
+      user: user,
       posts: posts,
       myPostList: myPostList,
       collectList: collectList,

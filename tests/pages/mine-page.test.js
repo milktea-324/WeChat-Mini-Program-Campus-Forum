@@ -4,16 +4,19 @@ const path = require("path")
 const minePagePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "pages", "mine", "mine.js")
 const commentStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "comment-store.js")
 const forumStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "forum-store.js")
+const userStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "user-store.js")
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value))
 }
 
-function loadMinePage(storage) {
+function loadMinePage(storage, options) {
   delete require.cache[require.resolve(minePagePath)]
   delete require.cache[require.resolve(commentStorePath)]
   delete require.cache[require.resolve(forumStorePath)]
+  delete require.cache[require.resolve(userStorePath)]
 
+  const config = options || {}
   const calls = []
   const data = storage || {}
   let pages = []
@@ -48,6 +51,14 @@ function loadMinePage(storage) {
     }
   }
 
+  const userStore = require(userStorePath)
+
+  if (config.currentUserError) {
+    userStore.getCurrentUser = function() {
+      throw new Error("current user unavailable")
+    }
+  }
+
   require(minePagePath)
 
   const page = {
@@ -74,6 +85,16 @@ function loadMinePage(storage) {
 }
 
 const context = loadMinePage({
+  forum_users: [
+    {
+      userId: "student-current",
+      nickname: "\u6d4b\u8bd5\u540c\u5b66",
+      avatar: "/images/avatar/12.png"
+    }
+  ],
+  forum_current_user: {
+    userId: "student-current"
+  },
   forum_posts: [
     {
       postId: 10,
@@ -82,6 +103,39 @@ const context = loadMinePage({
       authorId: "user-post-author",
       avatar: "/images/avatar/1.png",
       date: "2026-06-20",
+      commentCount: 0,
+      comments: []
+    },
+    {
+      postId: 11,
+      title: "\u6211\u7684\u53d1\u5e03",
+      author: "\u6d4b\u8bd5\u540c\u5b66",
+      authorId: "student-current",
+      avatar: "/images/avatar/12.png",
+      date: "2026-06-20",
+      isMine: true,
+      commentCount: 0,
+      comments: []
+    },
+    {
+      postId: 12,
+      title: "\u6211\u7684\u6536\u85cf",
+      author: "妤间富",
+      authorId: "user-post-author",
+      avatar: "/images/avatar/1.png",
+      date: "2026-06-20",
+      isCollected: true,
+      commentCount: 0,
+      comments: []
+    },
+    {
+      postId: 13,
+      title: "\u6211\u7684\u70b9\u8d5e",
+      author: "妤间富",
+      authorId: "user-post-author",
+      avatar: "/images/avatar/1.png",
+      date: "2026-06-20",
+      isLiked: true,
       commentCount: 0,
       comments: []
     }
@@ -121,7 +175,12 @@ const context = loadMinePage({
 context.page.onLoad()
 context.page.onShow()
 
+assert.strictEqual(context.page.data.user.nickname, "\u6d4b\u8bd5\u540c\u5b66")
+assert.strictEqual(context.page.data.user.avatar, "/images/avatar/12.png")
 assert.strictEqual(context.page.data.currentTab, "published")
+assert.strictEqual(context.page.data.myPostList.length, 1)
+assert.strictEqual(context.page.data.collectList.length, 1)
+assert.strictEqual(context.page.data.likeList.length, 1)
 assert.strictEqual(context.page.data.myCommentList.length, 2)
 assert.strictEqual(context.page.data.myCommentList[0].postTitle, "可查看帖子")
 assert.strictEqual(context.page.data.myCommentList[0].postAvailable, true)
@@ -193,5 +252,18 @@ assert.deepStrictEqual(context.calls[context.calls.length - 1], {
     icon: "none"
   }
 })
+
+const fallbackContext = loadMinePage({
+  forum_posts: [],
+  forum_comments: []
+}, {
+  currentUserError: true
+})
+
+fallbackContext.page.onLoad()
+fallbackContext.page.onShow()
+
+assert.strictEqual(fallbackContext.page.data.user.nickname, "校园用户")
+assert.strictEqual(fallbackContext.page.data.user.avatar, "/images/avatar/default.png")
 
 console.log("mine-page tests passed")
