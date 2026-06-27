@@ -7,19 +7,19 @@
       <swiper-item>
         <view class="banner-item" data-post-id="{{item.postId}}" bindtap="onTapBanner">
           <!-- 有封面：显示封面 -->
-          <image wx:if="{{item.postImg}}" class="banner-img" src="{{item.postImg}}" mode="aspectFill"></image>
+          <image wx:if="{{item.displayCoverUrl || item.coverUrl || item.postImg}}" class="banner-img" src="{{item.displayCoverUrl || item.coverUrl || item.postImg}}" mode="aspectFill"></image>
 
           <!-- 无封面：显示标题 -->
           <view wx:else class="banner-title-card">
             <view class="banner-rank">热度 TOP {{index + 1}}</view>
             <view class="banner-title-text">{{item.title}}</view>
             <view class="banner-info">
-              {{item.category}} · 浏览 {{item.view}} · 点赞 {{item.like}}
+              {{item.displayCategoryName || item.categoryName || item.category}} · 浏览 {{item.displayViewCount || item.view || 0}} · 点赞 {{item.displayLikeCount || item.like || 0}}
             </view>
           </view>
 
           <!-- 有封面时的标题遮罩 -->
-          <view wx:if="{{item.postImg}}" class="banner-mask">
+          <view wx:if="{{item.displayCoverUrl || item.coverUrl || item.postImg}}" class="banner-mask">
             <view class="banner-rank">热度 TOP {{index + 1}}</view>
             <view class="banner-title">{{item.title}}</view>
           </view>

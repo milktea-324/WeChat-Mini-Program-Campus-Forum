@@ -13,32 +13,32 @@
               class="forum-avatar-wrap"
               catchtap="onTapAuthor"
               data-author-id="{{item.authorId}}"
-              data-is-current-user="{{item.authorInfo.isCurrentUser}}"
-              data-author-name="{{item.author}}"
-              data-avatar="{{item.avatar}}"
+              data-is-current-user="{{item.displayIsCurrentUser || item.authorInfo.isCurrentUser}}"
+              data-author-name="{{item.displayAuthorName || item.authorName || item.author}}"
+              data-avatar="{{item.displayAuthorAvatar || item.authorAvatar || item.avatar}}"
             >
-              <image class="forum-avatar" src="{{item.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
+              <image class="forum-avatar" src="{{item.displayAuthorAvatar || item.authorAvatar || item.avatar || '/images/avatar/default.png'}}" mode="aspectFill"></image>
             </view>
 
             <view class="forum-user-info">
-              <text class="forum-author">{{item.author}}</text>
-              <text class="forum-date">{{item.date}}</text>
+              <text class="forum-author">{{item.displayAuthorName || item.authorName || item.author}}</text>
+              <text class="forum-date">{{item.displayTime || item.date}}</text>
             </view>
 
-            <text class="forum-category">{{item.category}}</text>
+            <text class="forum-category">{{item.displayCategoryName || item.categoryName || item.category}}</text>
           </view>
 
           <!-- 帖子主体 -->
-          <view class="forum-main {{item.postImg ? '' : 'forum-main-no-cover'}}">
+          <view class="forum-main {{(item.displayCoverUrl || item.coverUrl || item.postImg) ? '' : 'forum-main-no-cover'}}">
             <view class="forum-text">
               <text class="forum-title">{{item.title}}</text>
-              <text class="forum-content">{{item.content}}</text>
+              <text class="forum-content">{{item.content || item.summary}}</text>
             </view>
 
             <image 
-              wx:if="{{item.postImg}}" 
+              wx:if="{{item.displayCoverUrl || item.coverUrl || item.postImg}}"
               class="forum-cover" 
-              src="{{item.postImg}}" 
+              src="{{item.displayCoverUrl || item.coverUrl || item.postImg}}"
               mode="aspectFill"
             ></image>
           </view>
@@ -47,30 +47,30 @@
           <view class="forum-bottom">
             <view class="forum-count">
               <image class="forum-count-icon" src="/images/icon/view.png" mode="aspectFit"></image>
-              <text>{{item.view || 0}}</text>
+              <text>{{item.displayViewCount || item.view || 0}}</text>
             </view>
 
             <view class="forum-count">
               <image 
                 class="forum-count-icon" 
-                src="{{item.isLiked ? '/images/icon/like-active.png' : '/images/icon/like.png'}}" 
+                src="{{(item.displayIsLiked || item.isLiked) ? '/images/icon/like-active.png' : '/images/icon/like.png'}}"
                 mode="aspectFit"
               ></image>
-              <text>{{item.like || 0}}</text>
+              <text>{{item.displayLikeCount || item.like || 0}}</text>
             </view>
 
             <view class="forum-count">
               <image 
                 class="forum-count-icon" 
-                src="{{item.isCollected ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}" 
+                src="{{(item.displayIsCollected || item.isCollected) ? '/images/icon/collect-active.png' : '/images/icon/collect.png'}}"
                 mode="aspectFit"
               ></image>
-              <text>{{item.collect || 0}}</text>
+              <text>{{item.displayCollectCount || item.collect || 0}}</text>
             </view>
 
             <view class="forum-count">
               <image class="forum-count-icon" src="/images/icon/comment.png" mode="aspectFit"></image>
-              <text>{{item.commentCount || 0}}</text>
+              <text>{{item.displayCommentCount || item.commentCount || 0}}</text>
             </view>
           </view>
         </view>

@@ -1,8 +1,69 @@
 const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
+const postService = require("../../utils/post-service.js")
 const forumStore = require("../../utils/forum-store.js")
+const userStore = require("../../utils/user-store.js")
 const profileNav = require("../../utils/profile-nav.js")
 const routeNav = require("../../utils/route-nav.js")
+
+const DEFAULT_AVATAR = "/images/avatar/default.png"
+
+function toCount(value) {
+  const number = Number(value)
+
+  return Number.isFinite(number) ? number : 0
+}
+
+function buildPostCardDisplayView(cardView) {
+  const stats = cardView.stats || {}
+  const currentUserState = cardView.currentUserState || {}
+
+  return Object.assign({}, cardView, {
+    displayAuthorName: cardView.authorName || "",
+    displayAuthorAvatar: cardView.authorAvatar || DEFAULT_AVATAR,
+    displayCategoryName: cardView.categoryName || "",
+    displayCoverUrl: cardView.coverUrl || "",
+    displayViewCount: toCount(stats.viewCount),
+    displayLikeCount: toCount(stats.likeCount),
+    displayCollectCount: toCount(stats.collectCount),
+    displayCommentCount: toCount(stats.commentCount),
+    displayIsLiked: Boolean(currentUserState.isLiked),
+    displayIsCollected: Boolean(currentUserState.isCollected),
+    displayIsCurrentUser: Boolean(currentUserState.isMine)
+  })
+}
+
+function getPostCardContext() {
+  try {
+    const users = userStore.getUsers()
+    const currentUserRef = userStore.getCurrentUserRef()
+    const currentUser = currentUserRef && currentUserRef.userId
+      ? userStore.findUserById(currentUserRef.userId) || currentUserRef
+      : null
+
+    return {
+      users: users,
+      currentUser: currentUser
+    }
+  } catch (error) {
+    return {
+      users: [],
+      currentUser: null
+    }
+  }
+}
+
+function buildPostCardDisplayList(posts) {
+  const sourcePosts = Array.isArray(posts) ? posts : []
+  const context = getPostCardContext()
+
+  return postService.getPostCardViews({
+    posts: sourcePosts,
+    users: context.users,
+    categories: forumData.categoryList,
+    currentUser: context.currentUser
+  }).map(buildPostCardDisplayView)
+}
 
 Page({
   data: {
@@ -74,10 +135,11 @@ Page({
   // 加载帖子
   loadPosts() {
     const posts = forumStore.getPosts()
+    const hotBannerPosts = this.getHotBannerList(posts)
 
     this.setData({
       postList: posts,
-      bannerList: this.getHotBannerList(posts)
+      bannerList: buildPostCardDisplayList(hotBannerPosts)
     })
 
     this.filterPosts()
@@ -167,7 +229,7 @@ Page({
     })
 
     this.setData({
-      showPostList: result
+      showPostList: buildPostCardDisplayList(result)
     })
   },
 
