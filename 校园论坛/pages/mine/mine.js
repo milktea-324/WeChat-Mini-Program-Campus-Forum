@@ -1,32 +1,49 @@
 const forumData = require("../../data/forum-data.js")
 const postFilter = require("../../utils/post-filter.js")
 const forumStore = require("../../utils/forum-store.js")
-const commentStore = require("../../utils/comment-store.js")
-const mockUsers = require("../../utils/mock-users.js")
+const profileService = require("../../utils/profile-service.js")
+const postService = require("../../utils/post-service.js")
 const profileNav = require("../../utils/profile-nav.js")
 const routeNav = require("../../utils/route-nav.js")
-const userStore = require("../../utils/user-store.js")
 
-const DEFAULT_USER_PROFILE = {
-  nickname: "校园用户",
-  avatar: "/images/avatar/default.png"
+function isSamePostId(left, right) {
+  const leftNumber = Number(left)
+  const rightNumber = Number(right)
+
+  if (!Number.isNaN(leftNumber) && !Number.isNaN(rightNumber)) {
+    return leftNumber === rightNumber
+  }
+
+  return String(left) === String(right)
 }
 
-function getSafeCurrentUserProfile(defaultUser) {
-  const fallback = Object.assign({}, DEFAULT_USER_PROFILE, defaultUser || {})
+function isMyPost(post, myPostIds) {
+  const list = Array.isArray(myPostIds) ? myPostIds : []
 
-  try {
-    const currentUser = userStore.getCurrentUser()
-    const nickname = String(currentUser && currentUser.nickname || "").trim()
-    const avatar = String(currentUser && currentUser.avatar || "").trim()
+  return Boolean(post && post.isMine) ||
+    list.some(postId => isSamePostId(post && post.postId, postId))
+}
 
-    return Object.assign({}, fallback, {
-      nickname: nickname || fallback.nickname,
-      avatar: avatar || fallback.avatar
-    })
-  } catch (error) {
-    return fallback
-  }
+function buildPostCardViews(posts, context) {
+  const list = Array.isArray(posts) ? posts : []
+  const safeContext = context || {}
+  const currentUser = safeContext.currentUser || null
+  const baseUsers = Array.isArray(safeContext.users)
+    ? safeContext.users
+    : currentUser
+      ? [currentUser]
+      : []
+  const users = currentUser && currentUser.userId !== "current-user"
+    ? baseUsers.concat([Object.assign({}, currentUser, { userId: "current-user" })])
+    : baseUsers
+
+  return list
+    .map(post => postService.buildPostCardView(post, {
+      users: users,
+      categories: forumData.categoryList,
+      currentUser: currentUser
+    }))
+    .filter(item => Boolean(item))
 }
 
 Page({
@@ -127,29 +144,23 @@ Page({
 
   // 加载个人页数据
   loadData() {
-    const user = getSafeCurrentUserProfile(this.data.user)
     const posts = forumStore.getPosts()
     const myPostIds = forumStore.getMyPostIds()
+    const profileView = profileService.getMineProfileView({
+      posts: posts,
+      myPostIds: myPostIds
+    })
+    const profileStats = profileView.stats || {}
+    const profileLists = profileView.lists || {}
+    const user = profileView.user || this.data.user
 
     const myPostList = posts.filter(item => {
-      return item.isMine || myPostIds.includes(item.postId)
+      return isMyPost(item, myPostIds)
     })
 
     const collectList = posts.filter(item => item.isCollected)
 
     const likeList = posts.filter(item => item.isLiked)
-    const myCommentList = this.getMyComments(posts)
-
-    // 统计“我发布的帖子”收到的数据
-    let myViewCount = 0
-    let myLikeReceivedCount = 0
-    let myCollectReceivedCount = 0
-
-    myPostList.forEach(item => {
-      myViewCount += Number(item.view || 0)
-      myLikeReceivedCount += Number(item.like || 0)
-      myCollectReceivedCount += Number(item.collect || 0)
-    })
 
     this.setData({
       user: user,
@@ -157,10 +168,10 @@ Page({
       myPostList: myPostList,
       collectList: collectList,
       likeList: likeList,
-      myCommentList: myCommentList,
-      myViewCount: myViewCount,
-      myLikeReceivedCount: myLikeReceivedCount,
-      myCollectReceivedCount: myCollectReceivedCount
+      myCommentList: profileLists.myComments || [],
+      myViewCount: profileStats.receivedViewCount || 0,
+      myLikeReceivedCount: profileStats.receivedLikeCount || 0,
+      myCollectReceivedCount: profileStats.receivedCollectCount || 0
     })
 
     this.updateShowList()
@@ -257,13 +268,16 @@ Page({
       timeRange: timeRange,
       sortType: sortType
     })
+    const showList = buildPostCardViews(result, {
+      currentUser: this.data.user
+    })
 
     if (baseList.length > 0 && result.length === 0) {
       emptyText = "当前筛选条件下没有帖子"
     }
 
     this.setData({
-      showList: result,
+      showList: showList,
       tabTitle: tabTitle,
       emptyText: emptyText
     })
@@ -274,44 +288,6 @@ Page({
     const postId = event.currentTarget.dataset.postId
 
     routeNav.goPostDetail(postId)
-  },
-
-  getMyComments(posts) {
-    const postMap = this.createPostMap(posts)
-    const comments = commentStore.getComments()
-
-    return comments
-      .filter(comment => this.isMyComment(comment))
-      .map(comment => {
-        const post = postMap[String(comment.postId)]
-        const postAvailable = Boolean(post)
-
-        return Object.assign({}, comment, {
-          postTitle: postAvailable ? post.title : "原帖已不可用",
-          postAvailable: postAvailable
-        })
-      })
-  },
-
-  createPostMap(posts) {
-    const result = {}
-    const list = Array.isArray(posts) ? posts : []
-
-    list.forEach(post => {
-      result[String(post.postId)] = post
-    })
-
-    return result
-  },
-
-  isMyComment(comment) {
-    const authorId = String(comment && comment.authorId || "")
-    const author = String(comment && comment.author || "").trim()
-    const nickname = String(this.data.user && this.data.user.nickname || "").trim()
-
-    return authorId === mockUsers.CURRENT_USER_ID ||
-      author === "当前用户" ||
-      Boolean(nickname && author === nickname)
   },
 
   onTapComment(event) {

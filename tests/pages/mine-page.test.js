@@ -4,6 +4,8 @@ const path = require("path")
 const minePagePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "pages", "mine", "mine.js")
 const commentStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "comment-store.js")
 const forumStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "forum-store.js")
+const profileServicePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "profile-service.js")
+const postServicePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "post-service.js")
 const userStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "user-store.js")
 
 function clone(value) {
@@ -14,6 +16,8 @@ function loadMinePage(storage, options) {
   delete require.cache[require.resolve(minePagePath)]
   delete require.cache[require.resolve(commentStorePath)]
   delete require.cache[require.resolve(forumStorePath)]
+  delete require.cache[require.resolve(profileServicePath)]
+  delete require.cache[require.resolve(postServicePath)]
   delete require.cache[require.resolve(userStorePath)]
 
   const config = options || {}
@@ -56,6 +60,9 @@ function loadMinePage(storage, options) {
   if (config.currentUserError) {
     userStore.getCurrentUser = function() {
       throw new Error("current user unavailable")
+    }
+    userStore.getCurrentUserRef = function() {
+      throw new Error("current user ref unavailable")
     }
   }
 
@@ -112,7 +119,11 @@ const context = loadMinePage({
       author: "\u6d4b\u8bd5\u540c\u5b66",
       authorId: "student-current",
       avatar: "/images/avatar/12.png",
+      category: "\u5b66\u4e60\u4ea4\u6d41",
       date: "2026-06-20",
+      view: 6,
+      like: 2,
+      collect: 1,
       isMine: true,
       commentCount: 0,
       comments: []
@@ -123,6 +134,7 @@ const context = loadMinePage({
       author: "妤间富",
       authorId: "user-post-author",
       avatar: "/images/avatar/1.png",
+      category: "\u6821\u56ed\u751f\u6d3b",
       date: "2026-06-20",
       isCollected: true,
       commentCount: 0,
@@ -134,6 +146,7 @@ const context = loadMinePage({
       author: "妤间富",
       authorId: "user-post-author",
       avatar: "/images/avatar/1.png",
+      category: "\u6821\u56ed\u751f\u6d3b",
       date: "2026-06-20",
       isLiked: true,
       commentCount: 0,
@@ -182,10 +195,87 @@ assert.strictEqual(context.page.data.myPostList.length, 1)
 assert.strictEqual(context.page.data.collectList.length, 1)
 assert.strictEqual(context.page.data.likeList.length, 1)
 assert.strictEqual(context.page.data.myCommentList.length, 2)
+assert.strictEqual(context.page.data.myViewCount, 6)
+assert.strictEqual(context.page.data.myLikeReceivedCount, 2)
+assert.strictEqual(context.page.data.myCollectReceivedCount, 1)
+assert.strictEqual(context.page.data.showList.length, 1)
+assert.strictEqual(context.page.data.showList[0].postId, 11)
+assert.strictEqual(typeof context.page.data.showList[0].author, "object")
+assert.strictEqual(typeof context.page.data.showList[0].category, "object")
+assert.strictEqual(context.page.data.showList[0].authorName, "\u6d4b\u8bd5\u540c\u5b66")
+assert.strictEqual(context.page.data.showList[0].categoryName, "\u5b66\u4e60\u4ea4\u6d41")
+assert.strictEqual(typeof context.page.data.myPostList[0].author, "string")
+assert.strictEqual(typeof context.page.data.myPostList[0].category, "string")
 assert.strictEqual(context.page.data.myCommentList[0].postTitle, "可查看帖子")
 assert.strictEqual(context.page.data.myCommentList[0].postAvailable, true)
 assert.strictEqual(context.page.data.myCommentList[1].postTitle, "原帖已不可用")
 assert.strictEqual(context.page.data.myCommentList[1].postAvailable, false)
+
+context.page.onSearchInput({
+  detail: {
+    value: "\u6211\u7684\u53d1\u5e03"
+  }
+})
+
+assert.deepStrictEqual(context.page.data.showList.map(item => item.postId), [11])
+assert.strictEqual(typeof context.page.data.showList[0].author, "object")
+assert.strictEqual(typeof context.page.data.myPostList[0].author, "string")
+
+context.page.onTapCategory({
+  currentTarget: {
+    dataset: {
+      category: "\u5b66\u4e60\u4ea4\u6d41"
+    }
+  }
+})
+
+assert.deepStrictEqual(context.page.data.showList.map(item => item.postId), [11])
+
+context.page.onTapCategory({
+  currentTarget: {
+    dataset: {
+      category: "\u6821\u56ed\u751f\u6d3b"
+    }
+  }
+})
+
+assert.deepStrictEqual(context.page.data.showList.map(item => item.postId), [])
+
+context.page.setData({
+  keyword: "",
+  currentCategory: context.page.data.categoryList[0].name
+})
+context.page.onSortChange({
+  detail: {
+    value: 0
+  }
+})
+
+assert.deepStrictEqual(context.page.data.showList.map(item => item.postId), [11])
+
+context.page.onChangeTab({
+  currentTarget: {
+    dataset: {
+      tab: "collected"
+    }
+  }
+})
+
+assert.deepStrictEqual(context.page.data.showList.map(item => item.postId), [12])
+assert.strictEqual(typeof context.page.data.showList[0].author, "object")
+assert.strictEqual(typeof context.page.data.collectList[0].author, "string")
+
+context.page.onChangeTab({
+  currentTarget: {
+    dataset: {
+      tab: "liked"
+    }
+  }
+})
+
+assert.deepStrictEqual(context.page.data.showList.map(item => item.postId), [13])
+assert.strictEqual(typeof context.page.data.showList[0].author, "object")
+assert.strictEqual(typeof context.page.data.likeList[0].author, "string")
 
 context.page.onChangeTab({
   currentTarget: {
@@ -263,7 +353,7 @@ const fallbackContext = loadMinePage({
 fallbackContext.page.onLoad()
 fallbackContext.page.onShow()
 
-assert.strictEqual(fallbackContext.page.data.user.nickname, "校园用户")
+assert.strictEqual(fallbackContext.page.data.user.nickname, "\u5f53\u524d\u7528\u6237")
 assert.strictEqual(fallbackContext.page.data.user.avatar, "/images/avatar/default.png")
 
 console.log("mine-page tests passed")
