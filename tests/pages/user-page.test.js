@@ -5,6 +5,8 @@ const userPagePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b"
 const userStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "user-store.js")
 const forumStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "forum-store.js")
 const commentStorePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "comment-store.js")
+const profileServicePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "profile-service.js")
+const postServicePath = path.join(__dirname, "..", "..", "\u6821\u56ed\u8bba\u575b", "utils", "post-service.js")
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value))
@@ -15,6 +17,8 @@ function loadUserPage(storage) {
   delete require.cache[require.resolve(userStorePath)]
   delete require.cache[require.resolve(forumStorePath)]
   delete require.cache[require.resolve(commentStorePath)]
+  delete require.cache[require.resolve(profileServicePath)]
+  delete require.cache[require.resolve(postServicePath)]
 
   const calls = []
   const data = storage || {}
@@ -183,8 +187,15 @@ assert.strictEqual(context.page.data.user.stats.collectCount, 1)
 assert.strictEqual(context.page.data.user.stats.commentCount, 2)
 assert.strictEqual(context.page.data.authorPosts.length, 1)
 assert.strictEqual(context.page.data.authorPosts[0].authorId, "user-post-author")
+assert.strictEqual(typeof context.page.data.authorPosts[0].author, "object")
+assert.strictEqual(typeof context.page.data.authorPosts[0].category, "object")
+assert.strictEqual(context.page.data.authorPosts[0].authorName, "\u697c\u4e3b")
+assert.strictEqual(context.storage.forum_posts[0].author, "\u697c\u4e3b")
 assert.strictEqual(context.page.data.authorComments.length, 2)
 assert.ok(context.page.data.authorComments.every(comment => comment.authorId === "user-post-author"))
+assert.strictEqual(context.page.data.authorComments[0].authorMatchReason, "authorId")
+assert.strictEqual(context.page.data.authorComments[0].postTitle, "\u53ef\u67e5\u770b\u5e16\u5b50")
+assert.strictEqual(context.page.data.authorComments[0].postAvailable, true)
 assert.deepStrictEqual(context.calls.find(call => call.type === "setNavigationBarTitle"), {
   type: "setNavigationBarTitle",
   options: { title: "\u697c\u4e3b" }
@@ -319,6 +330,8 @@ assert.strictEqual(context.page.data.authorComments[0].postTitle, "可查看帖�
 assert.strictEqual(context.page.data.authorComments[0].postAvailable, true)
 assert.strictEqual(context.page.data.authorComments[1].postTitle, "原帖已不可用")
 assert.strictEqual(context.page.data.authorComments[1].postAvailable, false)
+assert.strictEqual(context.page.data.authorComments[0].authorMatchReason, "authorId")
+assert.strictEqual(context.page.data.authorComments[1].authorMatchReason, "nicknameFallback")
 
 context.page.onChangeTab({
   currentTarget: {

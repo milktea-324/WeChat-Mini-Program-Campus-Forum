@@ -1,6 +1,7 @@
 const mockUsers = require("../../utils/mock-users.js")
 const forumStore = require("../../utils/forum-store.js")
 const commentStore = require("../../utils/comment-store.js")
+const profileService = require("../../utils/profile-service.js")
 const profileNav = require("../../utils/profile-nav.js")
 const routeNav = require("../../utils/route-nav.js")
 const userStore = require("../../utils/user-store.js")
@@ -56,145 +57,56 @@ Page({
     const postData = forumStore.getPostData()
     const users = postData.users
     const posts = postData.posts || []
-
     const mockUser = mockUsers.findUserById(users, targetAuthorId)
-    const user = mergeUserProfile(mockUser, storedUser, targetAuthorId, {
-      nickname: this.data.fallbackNickname,
-      avatar: this.data.fallbackAvatar
+    const targetUser = mockUser || storedUser
+    const profileView = profileService.getUserProfileView(targetAuthorId, {
+      posts: posts,
+      comments: commentStore.getComments(),
+      users: mergeReadUsers(users, storedUser),
+      targetUser: targetUser,
+      fallbackNickname: this.data.fallbackNickname,
+      fallbackAvatar: this.data.fallbackAvatar
     })
+    const profileState = profileView.state || {}
+    const profileLists = profileView.lists || {}
 
-    if (user && user.isCurrentUser) {
+    if (profileState.isCurrentUser) {
       profileNav.goUserProfile({
         userId: targetAuthorId
       })
       return
     }
 
-    if (!user) {
-      const fallbackUser = this.createFallbackUser(targetAuthorId)
-
-      if (!fallbackUser) {
-        this.rejectUserPage("没有找到作者资料")
-        return
-      }
-
-      wx.setNavigationBarTitle({
-        title: fallbackUser.nickname
-      })
-
-      this.updateUserView(fallbackUser, [], posts, targetAuthorId, fallbackUser.nickname)
+    if (profileState.isMissingUser &&
+      !targetUser &&
+      !hasFallbackProfile(this.data.fallbackNickname, this.data.fallbackAvatar) &&
+      !(profileLists.authorPosts && profileLists.authorPosts.length > 0)) {
+      this.rejectUserPage("没有找到作者资料")
       return
     }
+
+    const user = createPageUser(profileView.user, targetUser, targetAuthorId, profileView.stats)
 
     wx.setNavigationBarTitle({
       title: user.nickname
     })
 
-    this.updateUserView(
-      user,
-      mockUser && mockUser.posts || user.posts || [],
-      posts,
-      targetAuthorId,
-      mockUser && mockUser.nickname || user.nickname
-    )
+    this.updateUserView(user, profileView)
   },
 
-  updateUserView(user, authorPosts, posts, targetAuthorId, targetNickname) {
-    const authorComments = this.getAuthorComments(targetAuthorId, targetNickname, posts)
-    const safeStats = Object.assign({}, user.stats || {}, {
-      postCount: authorPosts.length,
-      commentCount: authorComments.length
-    })
-    const safeUser = Object.assign({}, user, {
-      stats: safeStats
-    })
+  updateUserView(user, profileView) {
+    const profileLists = profileView.lists || {}
 
     this.setData({
-      user: safeUser,
-      authorPosts: authorPosts,
-      authorComments: authorComments,
+      user: user,
+      authorPosts: profileLists.authorPosts || [],
+      authorComments: profileLists.authorComments || [],
       emptyText: this.getEmptyText(this.data.activeTab)
     })
   },
 
-  getAuthorComments(authorId, nickname, posts) {
-    const postMap = this.createPostMap(posts)
-    const comments = commentStore.getComments()
-
-    return comments
-      .filter(comment => this.isAuthorComment(comment, authorId, nickname))
-      .map(comment => {
-        const post = postMap[String(comment.postId)]
-        const postAvailable = Boolean(post)
-
-        return Object.assign({}, comment, {
-          postTitle: postAvailable ? post.title : "原帖已不可用",
-          postAvailable: postAvailable
-        })
-      })
-  },
-
-  createPostMap(posts) {
-    const result = {}
-    const list = Array.isArray(posts) ? posts : []
-
-    list.forEach(post => {
-      result[String(post.postId)] = post
-    })
-
-    return result
-  },
-
-  isAuthorComment(comment, authorId, nickname) {
-    const targetId = String(authorId || "")
-    const targetName = String(nickname || "").trim()
-    const commentAuthorId = String(comment && comment.authorId || "")
-    const commentAuthor = String(comment && comment.author || "").trim()
-
-    if (commentAuthorId && commentAuthorId === targetId) {
-      return true
-    }
-
-    return Boolean(targetName && commentAuthor && commentAuthor === targetName)
-  },
-
   getEmptyText(tab) {
     return tab === "comments" ? "TA 还没有发表过评论" : "TA 还没有发布帖子"
-  },
-
-  createFallbackUser(authorId) {
-    const nickname = this.data.fallbackNickname || ""
-    const avatar = this.data.fallbackAvatar || ""
-
-    if (!nickname && !avatar) {
-      return null
-    }
-
-    return {
-      userId: authorId,
-      nickname: nickname || "校园用户",
-      avatar: avatar || "/images/avatar/default.png",
-      bio: "这位同学暂时还没有公开发布内容。",
-      role: "student",
-      roleName: "用户",
-      department: "校园论坛",
-      grade: "资料未完善",
-      tags: ["校园用户"],
-      isCurrentUser: false,
-      status: "active",
-      stats: {
-        postCount: 0,
-        viewCount: 0,
-        likeCount: 0,
-        collectCount: 0,
-        commentCount: 0
-      },
-      relation: {
-        isFollowing: false,
-        isBlocked: false
-      },
-      posts: []
-    }
   },
 
   rejectUserPage(message) {
@@ -270,6 +182,33 @@ function decodeOption(value) {
   }
 }
 
+function normalizeTags(tags) {
+  if (Array.isArray(tags)) {
+    return tags
+      .map(item => String(item || "").trim())
+      .filter(item => item !== "")
+  }
+
+  const text = String(tags || "").trim()
+
+  return text ? [text] : []
+}
+
+function hasFallbackProfile(nickname, avatar) {
+  return Boolean(String(nickname || "").trim() || String(avatar || "").trim())
+}
+
+function mergeReadUsers(users, storedUser) {
+  const result = Array.isArray(users) ? users.slice() : []
+  const storedUserId = String(storedUser && storedUser.userId || "").trim()
+
+  if (storedUserId && !result.some(user => String(user && user.userId || "") === storedUserId)) {
+    result.push(storedUser)
+  }
+
+  return result
+}
+
 function createEmptyStats() {
   return {
     postCount: 0,
@@ -278,6 +217,30 @@ function createEmptyStats() {
     collectCount: 0,
     commentCount: 0
   }
+}
+
+function createPageUser(profileUser, sourceUser, authorId, stats) {
+  const baseUser = Object.assign(
+    createDefaultUser(authorId),
+    sourceUser || {},
+    profileUser || {}
+  )
+  const safeStats = Object.assign(createEmptyStats(), baseUser.stats || {}, stats || {})
+
+  return Object.assign({}, baseUser, {
+    userId: baseUser.userId || authorId,
+    nickname: baseUser.nickname || "校园用户",
+    avatar: baseUser.avatar || "/images/avatar/default.png",
+    roleName: baseUser.roleName || "用户",
+    department: baseUser.department || "校园论坛",
+    grade: baseUser.grade || "资料未完善",
+    tags: normalizeTags(baseUser.tags),
+    stats: safeStats,
+    relation: baseUser.relation || {
+      isFollowing: false,
+      isBlocked: false
+    }
+  })
 }
 
 function createDefaultUser(authorId) {
@@ -300,45 +263,4 @@ function createDefaultUser(authorId) {
     },
     posts: []
   }
-}
-
-function mergeUserProfile(mockUser, storedUser, authorId) {
-  if (!mockUser && !storedUser) {
-    return null
-  }
-
-  const baseUser = Object.assign(
-    createDefaultUser(authorId),
-    mockUser || {}
-  )
-  const safeStoredUser = storedUser || {}
-  const hasMockUser = Boolean(mockUser)
-  const tags = hasMockUser && Array.isArray(baseUser.tags) && baseUser.tags.length > 0
-    ? baseUser.tags
-    : Array.isArray(safeStoredUser.tags) && safeStoredUser.tags.length > 0
-      ? safeStoredUser.tags
-      : Array.isArray(baseUser.tags) ? baseUser.tags : []
-
-  return Object.assign({}, baseUser, hasMockUser ? {} : safeStoredUser, {
-    userId: authorId,
-    nickname: safeStoredUser.nickname || baseUser.nickname || "校园用户",
-    avatar: safeStoredUser.avatar || baseUser.avatar || "/images/avatar/default.png",
-    roleName: safeStoredUser.roleName || baseUser.roleName || "用户",
-    department: safeStoredUser.department || baseUser.department || "校园论坛",
-    grade: safeStoredUser.grade || baseUser.grade || "资料未完善",
-    tags: tags,
-    isCurrentUser: Boolean(safeStoredUser.isCurrentUser || baseUser.isCurrentUser),
-    status: safeStoredUser.status || baseUser.status || "active",
-    nickname: hasMockUser ? baseUser.nickname : safeStoredUser.nickname || baseUser.nickname,
-    avatar: hasMockUser ? baseUser.avatar : safeStoredUser.avatar || baseUser.avatar,
-    roleName: hasMockUser ? baseUser.roleName || safeStoredUser.roleName : safeStoredUser.roleName || baseUser.roleName,
-    department: hasMockUser ? baseUser.department || safeStoredUser.department : safeStoredUser.department || baseUser.department,
-    grade: hasMockUser ? baseUser.grade || safeStoredUser.grade : safeStoredUser.grade || baseUser.grade,
-    stats: baseUser.stats || createEmptyStats(),
-    relation: baseUser.relation || {
-      isFollowing: false,
-      isBlocked: false
-    },
-    posts: baseUser.posts || []
-  })
 }
