@@ -190,13 +190,81 @@ function createPostMap(posts) {
   return result
 }
 
-function addPostAvailability(comment, postMap) {
+function hasKnownDifferentAuthor(comment, user, options) {
+  const authorId = normalizeId(comment && comment.authorId)
+  const userId = normalizeId(user && user.userId)
+
+  if (!authorId || !userId || isSameId(authorId, userId) || isSameId(authorId, CURRENT_USER_ID)) {
+    return false
+  }
+
+  return Boolean(findUserById(options && options.users, authorId))
+}
+
+function getCommentAuthorMatchReason(comment, user, options) {
+  const safeOptions = options || {}
+  const authorId = normalizeId(comment && comment.authorId)
+  const authorName = normalizeText(comment && comment.author)
+  const userId = normalizeId(user && user.userId)
+  const userName = normalizeText(user && user.nickname)
+  const currentUser = safeOptions.currentUser || null
+  const currentUserName = normalizeText(currentUser && currentUser.nickname)
+  const fallbackNickname = normalizeText(safeOptions.fallbackNickname)
+  const isCurrentUserTarget = Boolean(safeOptions.isCurrentUserTarget)
+
+  if (authorId && userId && isSameId(authorId, userId)) {
+    return "authorId"
+  }
+
+  if (isCurrentUserTarget) {
+    if (isSameId(authorId, CURRENT_USER_ID)) {
+      return "currentUserLegacyId"
+    }
+  }
+
+  // Follow-up hardening can expand this beyond the supplied users list.
+  // For now, known different authorIds block nickname-only fallback.
+  if (hasKnownDifferentAuthor(comment, user, safeOptions)) {
+    return ""
+  }
+
+  if (isCurrentUserTarget) {
+    if (authorName === "当前用户") {
+      return "currentUserDisplayName"
+    }
+
+    if (currentUserName && authorName === currentUserName) {
+      return "currentUserDisplayName"
+    }
+
+    if (userName && authorName === userName) {
+      return "currentUserDisplayName"
+    }
+  }
+
+  if (userName && authorName === userName) {
+    return "nicknameFallback"
+  }
+
+  if (fallbackNickname && authorName === fallbackNickname) {
+    return "nicknameFallback"
+  }
+
+  return ""
+}
+
+function isCommentAuthoredByUser(comment, user, options) {
+  return Boolean(getCommentAuthorMatchReason(comment, user, options))
+}
+
+function addPostAvailability(comment, postMap, authorMatchReason) {
   const post = postMap[normalizeId(comment && comment.postId)]
   const postAvailable = Boolean(post)
 
   return Object.assign({}, comment, {
     postTitle: postAvailable ? post.title : "原帖已不可用",
-    postAvailable: postAvailable
+    postAvailable: postAvailable,
+    authorMatchReason: authorMatchReason || ""
   })
 }
 
@@ -224,8 +292,16 @@ function isUserPost(post, userId) {
   return isSameId(getPostAuthorId(post), userId)
 }
 
-function isUserComment(comment, userId) {
-  return isSameId(comment && comment.authorId, userId)
+function buildCommentViews(comments, user, postMap, options) {
+  return asArray(comments)
+    .map(comment => {
+      const authorMatchReason = getCommentAuthorMatchReason(comment, user, options)
+
+      return authorMatchReason
+        ? addPostAvailability(comment, postMap, authorMatchReason)
+        : null
+    })
+    .filter(comment => Boolean(comment))
 }
 
 function sumPostField(posts, field) {
@@ -288,9 +364,11 @@ function buildMineProfileView(context) {
   const myPosts = posts.filter(post => isMyPost(post, myPostIds))
   const likedPosts = posts.filter(post => Boolean(post && post.isLiked))
   const collectedPosts = posts.filter(post => Boolean(post && post.isCollected))
-  const myComments = comments
-    .filter(comment => isUserComment(comment, user.userId))
-    .map(comment => addPostAvailability(comment, postMap))
+  const myComments = buildCommentViews(comments, user, postMap, {
+    users: safeContext.users,
+    currentUser: currentUser,
+    isCurrentUserTarget: true
+  })
 
   return {
     user: user,
@@ -323,8 +401,8 @@ function buildUserProfileView(userId, context) {
   const isMissingUser = !targetUser
   const user = normalizeProfileUser(targetUser || fallbackUser, {
     userId: targetId,
-    nickname: DEFAULT_NICKNAME,
-    avatar: DEFAULT_AVATAR,
+    nickname: normalizeText(safeContext.fallbackNickname) || DEFAULT_NICKNAME,
+    avatar: normalizeText(safeContext.fallbackAvatar) || DEFAULT_AVATAR,
     bio: "这位同学暂时还没有公开发布内容。"
   })
   const postMap = createPostMap(posts)
@@ -332,9 +410,12 @@ function buildUserProfileView(userId, context) {
     ? posts.filter(post => isUserPost(post, user.userId))
     : []
   const authorComments = user.userId
-    ? comments
-      .filter(comment => isUserComment(comment, user.userId))
-      .map(comment => addPostAvailability(comment, postMap))
+    ? buildCommentViews(comments, user, postMap, {
+      users: safeContext.users,
+      currentUser: currentUser,
+      fallbackNickname: safeContext.fallbackNickname,
+      isCurrentUserTarget: Boolean(user.userId && isSameId(user.userId, currentUser && currentUser.userId))
+    })
     : []
   const isCurrentUser = Boolean(user.userId && isSameId(user.userId, currentUser && currentUser.userId))
 
@@ -396,5 +477,7 @@ module.exports = {
   buildMineProfileView,
   buildUserProfileView,
   getMineProfileView,
-  getUserProfileView
+  getUserProfileView,
+  isCommentAuthoredByUser,
+  getCommentAuthorMatchReason
 }

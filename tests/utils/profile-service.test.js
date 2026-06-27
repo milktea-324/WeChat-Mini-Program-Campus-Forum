@@ -6,7 +6,8 @@ const {
   buildMineProfileView,
   buildUserProfileView,
   getMineProfileView,
-  getUserProfileView
+  getUserProfileView,
+  isCommentAuthoredByUser
 } = require(servicePath)
 
 const CATEGORY_STUDY = "\u5b66\u4e60\u4ea4\u6d41"
@@ -172,12 +173,61 @@ function createComments() {
       status: "active"
     },
     {
+      commentId: "comment-current-legacy-id",
+      postId: "mine-1",
+      authorId: "current-user",
+      author: "当前用户",
+      avatar: "/images/avatar/default.png",
+      content: "Current legacy id comment",
+      date: "2026-06-07",
+      status: "active"
+    },
+    {
+      commentId: "comment-current-display-name",
+      postId: "mine-1",
+      author: "当前用户",
+      avatar: "/images/avatar/default.png",
+      content: "Current display name comment",
+      date: "2026-06-07",
+      status: "active"
+    },
+    {
+      commentId: "comment-current-nickname",
+      postId: "mine-1",
+      authorId: "legacy-current-user",
+      author: "Current Student",
+      avatar: "/images/avatar/current.png",
+      content: "Current nickname comment",
+      date: "2026-06-07",
+      status: "active"
+    },
+    {
       commentId: "comment-target-1",
       postId: "target-1",
       authorId: TARGET_USER_ID,
       author: "Target Student",
       avatar: "/images/avatar/target.png",
       content: "Target comment",
+      date: "2026-06-08",
+      status: "active"
+    },
+    {
+      commentId: "comment-target-nickname",
+      postId: "target-1",
+      authorId: "legacy-target-user",
+      author: "Target Student",
+      avatar: "/images/avatar/target.png",
+      content: "Target nickname comment",
+      date: "2026-06-08",
+      status: "active"
+    },
+    {
+      commentId: "comment-known-other-same-name",
+      postId: "target-1",
+      authorId: "user-other",
+      author: "Target Student",
+      avatar: "/images/avatar/other.png",
+      content: "Known other same name comment",
       date: "2026-06-08",
       status: "active"
     },
@@ -245,17 +295,28 @@ mineView.lists.myPosts.forEach(assertPostCardView)
 mineView.lists.likedPosts.forEach(assertPostCardView)
 mineView.lists.collectedPosts.forEach(assertPostCardView)
 
-assert.strictEqual(mineView.lists.myComments.length, 2)
+assert.deepStrictEqual(mineView.lists.myComments.map(item => item.commentId), [
+  "comment-current-1",
+  "comment-current-missing",
+  "comment-current-legacy-id",
+  "comment-current-display-name",
+  "comment-current-nickname"
+])
 assert.strictEqual(mineView.lists.myComments[0].postTitle, "My first post")
 assert.strictEqual(mineView.lists.myComments[0].postAvailable, true)
 assert.strictEqual(mineView.lists.myComments[1].postTitle, "原帖已不可用")
 assert.strictEqual(mineView.lists.myComments[1].postAvailable, false)
+assert.strictEqual(mineView.lists.myComments[0].authorMatchReason, "authorId")
+assert.strictEqual(mineView.lists.myComments[1].authorMatchReason, "authorId")
+assert.strictEqual(mineView.lists.myComments[2].authorMatchReason, "currentUserLegacyId")
+assert.strictEqual(mineView.lists.myComments[3].authorMatchReason, "currentUserDisplayName")
+assert.strictEqual(mineView.lists.myComments[4].authorMatchReason, "currentUserDisplayName")
 
 assert.deepStrictEqual(mineView.stats, {
   postCount: 2,
   likedPostCount: 1,
   collectedPostCount: 1,
-  commentCount: 2,
+  commentCount: 5,
   receivedViewCount: 15,
   receivedLikeCount: 3,
   receivedCollectCount: 5
@@ -267,13 +328,22 @@ assert.strictEqual(userView.user.userId, TARGET_USER_ID)
 assert.strictEqual(userView.user.nickname, "Target Student")
 assert.strictEqual(userView.user.roleName, "Club Lead")
 assert.deepStrictEqual(userView.lists.authorPosts.map(item => item.postId), ["target-1"])
-assert.strictEqual(userView.lists.authorComments.length, 1)
+assert.deepStrictEqual(userView.lists.authorComments.map(item => item.commentId), [
+  "comment-target-1",
+  "comment-target-nickname"
+])
 assert.strictEqual(userView.lists.authorComments[0].postTitle, "Target post")
 assert.strictEqual(userView.lists.authorComments[0].postAvailable, true)
+assert.strictEqual(userView.lists.authorComments[0].authorMatchReason, "authorId")
+assert.strictEqual(userView.lists.authorComments[1].authorMatchReason, "nicknameFallback")
+assert.strictEqual(
+  userView.lists.authorComments.some(item => item.commentId === "comment-known-other-same-name"),
+  false
+)
 userView.lists.authorPosts.forEach(assertPostCardView)
 assert.deepStrictEqual(userView.stats, {
   postCount: 1,
-  commentCount: 1,
+  commentCount: 2,
   viewCount: 7,
   likeCount: 3,
   collectCount: 2
@@ -290,6 +360,46 @@ const currentUserView = buildUserProfileView(CURRENT_USER_ID, createContext({
 
 assert.strictEqual(currentUserView.state.isCurrentUser, true)
 assert.strictEqual(currentUserView.state.canViewProfile, true)
+
+const shadowAuthorView = buildUserProfileView("user-f0if", createContext({
+  users: [
+    {
+      userId: "user-f0if",
+      nickname: "南风",
+      avatar: "/images/avatar/5.png"
+    }
+  ],
+  targetUser: {
+    userId: "user-f0if",
+    nickname: "南风",
+    avatar: "/images/avatar/5.png"
+  },
+  comments: [
+    {
+      commentId: "old-shadow-nanfeng",
+      postId: "target-1",
+      authorId: "comment-author-f0if",
+      author: "南风",
+      avatar: "/images/avatar/wrong.png",
+      content: "旧缓存中的南风评论",
+      date: "2026-06-22",
+      status: "active"
+    }
+  ]
+}))
+
+assert.deepStrictEqual(shadowAuthorView.lists.authorComments.map(item => item.commentId), ["old-shadow-nanfeng"])
+assert.strictEqual(shadowAuthorView.lists.authorComments[0].authorMatchReason, "nicknameFallback")
+
+assert.strictEqual(isCommentAuthoredByUser({
+  commentId: "fallback-direct",
+  author: "南风"
+}, {
+  userId: "user-f0if",
+  nickname: "南风"
+}, {
+  users: []
+}), true)
 
 const missingUserView = buildUserProfileView("missing-user", createContext({
   targetUser: null
