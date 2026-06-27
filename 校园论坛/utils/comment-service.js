@@ -198,6 +198,14 @@ function isTargetNicknameFallback(comment, context) {
   ))
 }
 
+function isCurrentUserTarget(user, context) {
+  const userId = normalizeId(user && user.userId)
+  const currentUserId = normalizeId(context && context.currentUser && context.currentUser.userId)
+
+  return Boolean(context && context.isCurrentUserTarget) ||
+    Boolean(userId && currentUserId && isSameId(userId, currentUserId))
+}
+
 function getCommentAuthorMatchReason(comment, user, context) {
   const safeContext = context || {}
   const safeUser = user || {}
@@ -207,12 +215,13 @@ function getCommentAuthorMatchReason(comment, user, context) {
   const userName = normalizeText(safeUser.nickname)
   const currentUserName = normalizeText(safeContext.currentUser && safeContext.currentUser.nickname)
   const fallbackNickname = normalizeText(safeContext.fallbackNickname)
+  const currentUserTarget = isCurrentUserTarget(safeUser, safeContext)
 
   if (authorId && userId && isSameId(authorId, userId)) {
     return "authorId"
   }
 
-  if (userId && isSameId(userId, CURRENT_USER_ID) && isSameId(authorId, CURRENT_USER_ID)) {
+  if (currentUserTarget && isSameId(authorId, CURRENT_USER_ID)) {
     return "currentUserLegacyId"
   }
 
@@ -220,7 +229,7 @@ function getCommentAuthorMatchReason(comment, user, context) {
     return ""
   }
 
-  if (userId && isSameId(userId, CURRENT_USER_ID)) {
+  if (currentUserTarget) {
     if (authorName === "\u5f53\u524d\u7528\u6237" ||
       Boolean(currentUserName && authorName === currentUserName) ||
       Boolean(userName && authorName === userName)) {
@@ -337,6 +346,12 @@ function buildCommentItemView(comment, context) {
   const source = comment || {}
   const author = resolveAuthor(source, safeContext)
   const post = getPostView(source, safeContext)
+  const rawAuthorId = source.authorId === undefined || source.authorId === null
+    ? null
+    : source.authorId
+  const rawAuthorName = source.author === undefined || source.author === null
+    ? null
+    : source.author
   const isLiked = Boolean(source.isLiked)
   const isDisliked = Boolean(source.isDisliked)
   const authorMatchReason = normalizeText(safeContext.authorMatchReason) ||
@@ -379,8 +394,11 @@ function buildCommentItemView(comment, context) {
 
     authorMatchReason: authorMatchReason,
 
-    authorId: author.userId,
+    authorId: rawAuthorId,
+    rawAuthorId: rawAuthorId,
+    legacyAuthorId: rawAuthorId,
     authorName: author.nickname,
+    rawAuthorName: rawAuthorName,
     avatar: author.avatar,
     date: normalizeText(source.date) || normalizeText(source.createdAt),
     postTitle: post.title,

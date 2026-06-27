@@ -10,6 +10,7 @@ const {
 } = require(servicePath)
 
 const CURRENT_USER_ID = "current-user"
+const REAL_CURRENT_USER_ID = "student-current"
 const TARGET_USER_ID = "user-target"
 
 function clone(value) {
@@ -244,6 +245,12 @@ assert.strictEqual(view.authorMatchReason, "currentUserDisplayName")
 
 view = buildCommentItemView(context.comments[4], context)
 assert.strictEqual(view.authorMatchReason, "nicknameFallback")
+assert.strictEqual(view.author.userId, TARGET_USER_ID)
+assert.strictEqual(view.authorId, "legacy-target-id")
+assert.strictEqual(view.rawAuthorId, "legacy-target-id")
+assert.strictEqual(view.legacyAuthorId, "legacy-target-id")
+assert.strictEqual(view.authorName, "\u76ee\u6807\u540c\u5b66")
+assert.strictEqual(view.rawAuthorName, "\u76ee\u6807\u540c\u5b66")
 assert.strictEqual(view.postAvailable, false)
 
 let threads = getPostCommentViews("post-1", context)
@@ -277,6 +284,75 @@ assert.deepStrictEqual(userComments.map(item => item.commentId), [
 ])
 assert.strictEqual(userComments[0].authorMatchReason, "currentUserDisplayName")
 assert.strictEqual(userComments[1].authorMatchReason, "authorId")
+
+userComments = getUserCommentViews(REAL_CURRENT_USER_ID, createContext({
+  users: [
+    {
+      userId: REAL_CURRENT_USER_ID,
+      nickname: "\u6d4b\u8bd5\u540c\u5b66",
+      avatar: "/images/avatar/12.png",
+      roleName: "\u5b66\u751f"
+    }
+  ],
+  currentUser: {
+    userId: REAL_CURRENT_USER_ID,
+    nickname: "\u6d4b\u8bd5\u540c\u5b66",
+    avatar: "/images/avatar/12.png",
+    roleName: "\u5b66\u751f"
+  },
+  targetUser: {
+    userId: REAL_CURRENT_USER_ID,
+    nickname: "\u6d4b\u8bd5\u540c\u5b66",
+    avatar: "/images/avatar/12.png",
+    roleName: "\u5b66\u751f"
+  },
+  fallbackNickname: "\u6d4b\u8bd5\u540c\u5b66",
+  comments: [
+    {
+      commentId: "real-current-legacy-id",
+      postId: "post-1",
+      authorId: CURRENT_USER_ID,
+      author: "\u5f53\u524d\u7528\u6237",
+      content: "\u65e7 current-user id",
+      date: "2026-06-23",
+      status: "active"
+    },
+    {
+      commentId: "real-current-display",
+      postId: "post-1",
+      author: "\u5f53\u524d\u7528\u6237",
+      content: "\u65e7\u5f53\u524d\u7528\u6237\u540d",
+      date: "2026-06-24",
+      status: "active"
+    },
+    {
+      commentId: "real-current-nickname",
+      postId: "post-1",
+      authorId: "legacy-current-id",
+      author: "\u6d4b\u8bd5\u540c\u5b66",
+      content: "\u65e7\u6635\u79f0\u515c\u5e95",
+      date: "2026-06-25",
+      status: "active"
+    },
+    {
+      commentId: "real-current-other",
+      postId: "post-1",
+      authorId: "user-other",
+      author: "\u5176\u4ed6\u540c\u5b66",
+      content: "\u4e0d\u5c5e\u4e8e\u5f53\u524d\u7528\u6237",
+      date: "2026-06-26",
+      status: "active"
+    }
+  ]
+}))
+assert.deepStrictEqual(userComments.map(item => item.commentId), [
+  "real-current-nickname",
+  "real-current-display",
+  "real-current-legacy-id"
+])
+assert.strictEqual(userComments[0].authorMatchReason, "currentUserDisplayName")
+assert.strictEqual(userComments[1].authorMatchReason, "currentUserDisplayName")
+assert.strictEqual(userComments[2].authorMatchReason, "currentUserLegacyId")
 
 assert.strictEqual(JSON.stringify(context.comments), beforeComments)
 assert.strictEqual(JSON.stringify(context.posts), beforePosts)
