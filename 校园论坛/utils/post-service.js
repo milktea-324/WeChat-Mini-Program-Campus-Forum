@@ -243,6 +243,22 @@ function buildLegacyAuthorInfo(post, authorView) {
   })
 }
 
+function buildDisplayFields(authorView, categoryView, coverMedia, post) {
+  return {
+    authorName: normalizeText(authorView && authorView.nickname) ||
+      normalizeText(post && post.author) ||
+      DEFAULT_USER_NAME,
+    categoryName: normalizeText(categoryView && categoryView.name) ||
+      normalizeText(post && post.category) ||
+      DEFAULT_CATEGORY_NAME,
+    authorAvatar: normalizeText(authorView && authorView.avatar) ||
+      normalizeText(post && post.avatar) ||
+      DEFAULT_AVATAR,
+    coverUrl: normalizeText(coverMedia && coverMedia.displayUrl) ||
+      normalizeText(post && post.postImg)
+  }
+}
+
 function buildPostCardView(post, context) {
   if (!post) {
     return null
@@ -251,6 +267,7 @@ function buildPostCardView(post, context) {
   const safeContext = context || {}
   const authorView = buildAuthorView(post, safeContext)
   const categoryView = buildCategoryView(post, safeContext)
+  const coverMedia = buildCoverMedia(post)
   const statsView = buildStatsView(post)
   const currentUserState = buildCurrentUserState(post, safeContext.currentUser)
   const createdAt = getCreatedAt(post)
@@ -258,6 +275,7 @@ function buildPostCardView(post, context) {
   const legacyAuthorInfo = buildLegacyAuthorInfo(post, authorView)
   const legacyAuthor = normalizeText(post.author) || authorView.nickname
   const legacyCategory = normalizeText(post.category) || categoryView.name
+  const displayFields = buildDisplayFields(authorView, categoryView, coverMedia, post)
 
   return {
     postId: post.postId,
@@ -266,7 +284,7 @@ function buildPostCardView(post, context) {
 
     author: authorView,
     category: categoryView,
-    coverMedia: buildCoverMedia(post),
+    coverMedia: coverMedia,
     stats: statsView,
     currentUserState: currentUserState,
 
@@ -277,11 +295,15 @@ function buildPostCardView(post, context) {
     updatedAt: updatedAt,
     displayTime: post.displayTime || post.date || createdAt || "",
 
+    authorName: displayFields.authorName,
+    categoryName: displayFields.categoryName,
+    authorAvatar: displayFields.authorAvatar,
+    coverUrl: displayFields.coverUrl,
+
     // legacy fields for current pages
     authorId: authorView.userId,
     avatar: post.avatar || authorView.avatar,
     authorInfo: legacyAuthorInfo,
-    categoryName: categoryView.name,
     postImg: post.postImg || "",
     date: post.date || "",
     view: statsView.viewCount,

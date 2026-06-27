@@ -95,17 +95,25 @@ assert.deepStrictEqual(view.author, {
   avatar: "/images/avatar/user-one.png",
   roleName: "Student"
 })
+assert.strictEqual(typeof view.author, "object")
+assert.strictEqual(view.author.nickname, "User One")
 assert.deepStrictEqual(view.category, {
   categoryId: 1,
   name: CATEGORY_STUDY,
   icon: "book",
   color: "#2f6fed"
 })
+assert.strictEqual(typeof view.category, "object")
+assert.strictEqual(view.category.name, CATEGORY_STUDY)
 assert.ok(view.coverMedia)
 assert.strictEqual(view.coverMedia.mediaId, "post-post-1-cover")
 assert.strictEqual(view.coverMedia.type, "image")
 assert.strictEqual(view.coverMedia.usageType, "cover")
 assert.strictEqual(view.coverMedia.displayUrl, "/images/post/cover.png")
+assert.strictEqual(view.authorName, "User One")
+assert.strictEqual(view.categoryName, CATEGORY_STUDY)
+assert.strictEqual(view.authorAvatar, "/images/avatar/user-one.png")
+assert.strictEqual(view.coverUrl, "/images/post/cover.png")
 
 assert.deepStrictEqual(view.stats, {
   viewCount: 10,
@@ -147,6 +155,10 @@ assert.strictEqual(view.content, post.content)
 assert.strictEqual(view.legacy.author, "Legacy Author")
 assert.strictEqual(view.legacy.category, CATEGORY_STUDY)
 assert.strictEqual(view._debug, undefined)
+assert.strictEqual(post.authorName, undefined)
+assert.strictEqual(post.categoryName, undefined)
+assert.strictEqual(post.authorAvatar, undefined)
+assert.strictEqual(post.coverUrl, undefined)
 
 view = buildPostCardView(createPost({
   postId: "post-no-cover",
@@ -154,6 +166,7 @@ view = buildPostCardView(createPost({
 }), createContext())
 
 assert.strictEqual(view.coverMedia, null)
+assert.strictEqual(view.coverUrl, "")
 
 const sourcePosts = [
   createPost({
@@ -223,5 +236,9 @@ assert.strictEqual(fallbackView.author.avatar, "/images/avatar/default.png")
 assert.strictEqual(fallbackView.category.categoryId, null)
 assert.ok(fallbackView.category.name)
 assert.strictEqual(fallbackView.coverMedia, null)
+assert.strictEqual(fallbackView.authorName, "校园用户")
+assert.strictEqual(fallbackView.categoryName, "未分类")
+assert.strictEqual(fallbackView.authorAvatar, "/images/avatar/default.png")
+assert.strictEqual(fallbackView.coverUrl, "")
 
 console.log("post-service tests passed")
